@@ -2,12 +2,6 @@
 
 import Database from '../Database';
 import { DataTypes } from 'sequelize';
-import AddressDb from './AddressDb';
-export const BILL_TYPES = {
-    NONE: 'none',
-    LAST_DAY: 'last_day',
-};
-export const BILL_TYPES_ARRAY = ['none', 'last_day'];
 
 const USERS_TABLE = 'users';
 

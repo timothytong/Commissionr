@@ -24,7 +24,7 @@ const Database = (process.env.NODE_ENV === 'production' || process.env.NODE_ENV 
         },
     ) : new Sequelize(
         process.env.PGUSER,
-        'sniff',
+        process.env.PGDATABASE,
         process.env.PGPASSWORD , {
             host: 'localhost',
             port: process.env.PGPORT,
