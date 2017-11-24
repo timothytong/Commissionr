@@ -42,6 +42,76 @@ export default class UserRouter {
     init(): void {
         this.router.post('/create', this.createUser);
         this.router.post('/validate', this.validateUser);
+        this.router.post('/login', this.loginUser);
+        this.router.post('/changePassword', this.changePassword);
+    }
+
+    changePassword(req: $Request, res: $Response): void {
+        const { body } = req;
+        const userId : string = req.session.key['id'];
+        const password : string = body.password;
+        const newPassword : string = body.newPassword;
+        let errorMsg : string = 'Incorrect password supplied.';
+
+        UserModels.userDb.update({
+            password: newPassword
+        },{ 
+            where: {
+                id: userId,
+                password: password,
+            },
+            returns: true,
+        }).then((data) => {
+            if (data[0] > 0) { 
+                return res.status(200).json({
+                    message: 'Successfully changed password.',
+                });
+            } else {
+                return res.status(400).json({
+                    message: errorMsg,
+                    error: err.message,
+                });
+            }
+        }).catch((err) => {
+            logger.error(errorMsg, err, err.message);
+            return res.status(400).json({
+                message: errorMsg,
+                error: err.message,
+            });
+        });
+    }
+
+    loginUser(req: $Request, res: $Response): void {
+        const { body } = req;
+        const username : string = body.username;
+        const password : string = body.password;
+        let errorMsg : string = 'Invalid username or password.'; 
+
+        UserModels.userDb.findOne({
+            where: {
+                user_name: username,
+                password: password,
+                active: true,
+            }
+        }).then((data) => {
+            if (!!data) {
+                req.session.key = data.dataValues;
+                return res.status(200).json({
+                    message: 'Login successful.',
+                });
+            } else {
+                return res.status(400).json({
+                    message: errorMsg,
+                    error: err.message,
+                });
+            }
+        }).catch((err) => {
+            logger.error(errorMsg, err, err.message);
+            return res.status(400).json({
+                message: errorMsg,
+                error: err.message,
+            });
+        });
     }
 
     validateUser(req: $Request, res: $Response): void {
@@ -113,6 +183,7 @@ export default class UserRouter {
             });
         })
     }
+
 }
 
 function checkUserNameExists (username : string) {
