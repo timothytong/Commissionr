@@ -43,7 +43,9 @@ export default class UserRouter {
         this.router.post('/create', this.createUser);
         this.router.post('/validate', this.validateUser);
         this.router.post('/login', this.loginUser);
+        this.router.post('/delete', this.deleteUser)
         this.router.post('/changePassword', this.changePassword);
+        this.router.get('/logout', this.logout);
     }
 
     changePassword(req: $Request, res: $Response): void {
@@ -112,6 +114,59 @@ export default class UserRouter {
                 error: err.message,
             });
         });
+    }
+
+    logout(req: $Request, res: $Response): void {
+        if (!!req.session.key) {
+            delete req.session.key;
+            return res.status(200).json({
+                message: 'Successfully logged out.',
+            });
+        } else {
+            return res.status(500).json({
+                message: 'User not authenticated.'
+            })
+        }
+    }
+
+    deleteUser(req: $Request, res: $Response): void {
+        const { body } = req;
+        let errorMsg : string = 'User cannot be deleted.';    
+        
+        if (!!req.session.key) {
+            const userId = req.session.key['id'];
+            UserModels.userDb.update({
+                active: false,
+            },{ 
+                where: {
+                    id: userId,
+                },
+                returns: true,
+            }).then((data) => {
+                if (data[0] > 0) { 
+                    delete req.session.key;
+                    return res.status(200).json({
+                        message: 'Successfully deleted user.',
+                    });
+                } else {
+                    return res.status(400).json({
+                        message: errorMsg,
+                        error: err.message,
+                    });
+                }
+            }).catch((err) => {
+                logger.error(errorMsg, err, err.message);
+                return res.status(400).json({
+                    message: errorMsg,
+                    error: err.message,
+                });
+            });
+        } else {
+            return res.status(500).json({
+                message: 'User not authenticated.'
+            })
+        }
+      
     }
 
     validateUser(req: $Request, res: $Response): void {
