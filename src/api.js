@@ -12,6 +12,7 @@ import path from 'path';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import UserRouter from './routes/UserRouter';
+import PostRouter from './routes/PostRouter';
 import { REGEN_LOCAL_DB } from './utils/Args';
 import regenDb from './models/RegenDb';
 
@@ -51,9 +52,11 @@ export default class Api {
     // connect resource routers
     routes(): void {
         const userRouter: UserRouter = new UserRouter();
+        const postRouter: PostRouter = new PostRouter();
 
         // attach it to our express app
         this.express.use(userRouter.path, checkRedisConnect, userRouter.router);
+        this.express.use(postRouter.path, checkRedisConnect, postRouter.router);
     }
 
     // generate databases
