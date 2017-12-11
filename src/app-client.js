@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import LoginPage from '../src/components/LoginPage';
 
 window.onload = () => {
-  ReactDOM.render(<div></div>, document.getElementById('app'));
+  ReactDOM.render(
+  	<LoginPage />, 
+  	document.getElementById('app'));
 };

@@ -20,7 +20,7 @@ setHost();
 const config = {
   entry: path.join(__dirname, 'src', 'app-client.js'),
   output: {
-    path: path.join(__dirname, 'src', 'static', 'js'),
+    path: path.join(__dirname, 'build', 'static', 'js'),
     filename: 'bundle.js'
   },
   devtool: "#eval-source-map",

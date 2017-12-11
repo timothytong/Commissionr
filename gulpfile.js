@@ -9,7 +9,7 @@ const zip = require('gulp-zip');
 const runSequence = require('run-sequence');
 
 gulp.task('scripts', () => {
-    return gulp.src(['!src/static/**/*' ,'src/**/*.js'])
+    return gulp.src(['!src/static/**/*', 'src/**/*.js'])
         .pipe(sourcemaps.init())
         .pipe(babel())
         .pipe(sourcemaps.write('.'))

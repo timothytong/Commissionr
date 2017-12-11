@@ -57,6 +57,7 @@ export default class Api {
         // attach it to our express app
         this.express.use(userRouter.path, checkRedisConnect, userRouter.router);
         this.express.use(postRouter.path, checkRedisConnect, postRouter.router);
+        this.express.use('/', express.static(path.join(__dirname, 'static')));
     }
 
     // generate databases
