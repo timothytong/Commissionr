@@ -77,10 +77,10 @@ gulp.task('yarn', () => {
         .pipe(yarn());
 });
 
-gulp.task('watch', ['flow', 'scripts', 'html', 'support', 'webpack'], () => {
+gulp.task('watch', ['webpack', 'flow', 'scripts', 'html', 'support'], () => {
     gulp.watch(['src/**/*.js'], ['flow', 'scripts', 'html']);
     gulp.watch(['src/static/*.html'], ['html']);
-    gulp.watch(['src/components/*.jsx', 'src/components/**/*.jsx'], ['webpack']);
+    gulp.watch(['src/components/**/*.js', 'src/components/*.js', 'src/components/*.jsx', 'src/components/**/*.jsx'], ['webpack']);
     gulp.watch(['package.json'], ['yarn']);
 });
 
