@@ -46,6 +46,20 @@ export default class UserRouter {
         this.router.post('/delete', this.deleteUser)
         this.router.post('/changePassword', this.changePassword);
         this.router.get('/logout', this.logout);
+        this.router.get('/session', this.getSession);
+    }
+
+    getSession(req: $Request, res: $Response): void {
+        if (!!req.session.key) {
+            console.log(req.session.key['id']);
+            return res.status(200).json({
+                message: 'User is logged in',
+            });
+        } else {
+            return res.status(500).json({
+                message: 'User not logged in'
+            })
+        }
     }
 
     changePassword(req: $Request, res: $Response): void {
@@ -57,14 +71,14 @@ export default class UserRouter {
 
         UserModels.userDb.update({
             password: newPassword
-        },{ 
+        },{
             where: {
                 id: userId,
                 password: password,
             },
             returns: true,
         }).then((data) => {
-            if (data[0] > 0) { 
+            if (data[0] > 0) {
                 return res.status(200).json({
                     message: 'Successfully changed password.',
                 });
@@ -87,7 +101,7 @@ export default class UserRouter {
         const { body } = req;
         const username : string = body.username;
         const password : string = body.password;
-        let errorMsg : string = 'Invalid username or password.'; 
+        let errorMsg : string = 'Invalid username or password.';
 
         UserModels.userDb.findOne({
             where: {
@@ -131,19 +145,19 @@ export default class UserRouter {
 
     deleteUser(req: $Request, res: $Response): void {
         const { body } = req;
-        let errorMsg : string = 'User cannot be deleted.';    
-        
+        let errorMsg : string = 'User cannot be deleted.';
+
         if (!!req.session.key) {
             const userId = req.session.key['id'];
             UserModels.userDb.update({
                 active: false,
-            },{ 
+            },{
                 where: {
                     id: userId,
                 },
                 returns: true,
             }).then((data) => {
-                if (data[0] > 0) { 
+                if (data[0] > 0) {
                     delete req.session.key;
                     return res.status(200).json({
                         message: 'Successfully deleted user.',
@@ -166,13 +180,12 @@ export default class UserRouter {
                 message: 'User not authenticated.'
             })
         }
-      
     }
 
     validateUser(req: $Request, res: $Response): void {
         const { body } = req;
         const username : string = body.username;
-        let errorMsg : string = 'User already exists';    
+        let errorMsg : string = 'User already exists';
 
         checkUserNameExists(username).then((data) => {
             if (!!data) {
