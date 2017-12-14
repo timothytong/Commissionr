@@ -10,6 +10,7 @@ export default class LoginPage extends React.Component {
 		};
 		this.handleChange = this.handleChange.bind(this);
 		this.handleLoginButtonClicked = this.handleLoginButtonClicked.bind(this);
+		this.handleNewUserClicked = this.handleNewUserClicked.bind(this);
 	}
 
 	handleChange(e) {
@@ -31,6 +32,11 @@ export default class LoginPage extends React.Component {
 		});
 	}
 
+	handleNewUserClicked() {
+		this.setState({username: '', password: ''});
+        this.props.history.push('/signup');
+    }
+
   	render() {
 	    return (
 	        <div>
@@ -38,8 +44,8 @@ export default class LoginPage extends React.Component {
                 <input onChange={this.handleChange} type="text" name="username" />
 				<h4>Password:</h4>
                 <input onChange={this.handleChange} type="password" name="password" />
-
 				<button type="button" onClick={this.handleLoginButtonClicked}>Login</button>
+				<button type="button" onClick={this.handleNewUserClicked}>New User</button>
 			</div>
 	    );
   	}
