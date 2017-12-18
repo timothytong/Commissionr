@@ -40,6 +40,7 @@ export default class LoginPage extends React.Component {
   	render() {
 	    return (
 	        <div>
+	        	{!!this.props.location.state ? <p>{this.props.location.state.message}</p> : ""}
 				<h4>Username:</h4>
                 <input onChange={this.handleChange} type="text" name="username" />
 				<h4>Password:</h4>

@@ -33,7 +33,7 @@ export default class SignUpPage extends React.Component {
 			.then((response) => {
 				console.log(response);
 				this.setState({email: '', username: '', password: ''});
-				this.props.history.push('/');
+				this.props.history.push('/', { message: 'User successfully created.' });
 			})
 			.catch((error) => {
 				console.log(error);
