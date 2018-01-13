@@ -7,10 +7,23 @@ export default class LoginPage extends React.Component {
 		this.state = {
 		    username: '',
 		    password: '',
+		    errorMessage: '',
 		};
 		this.handleChange = this.handleChange.bind(this);
 		this.handleLoginButtonClicked = this.handleLoginButtonClicked.bind(this);
 		this.handleNewUserClicked = this.handleNewUserClicked.bind(this);
+	}
+
+	componentDidMount() {
+		axios.get('http://localhost:3000/api/v1/user/session')
+        .then((response) => {
+            if (response.status === 200) {
+            	this.props.history.push('/homepage');
+            }
+        })
+        .catch((error) => {
+			console.log(error);
+		});
 	}
 
 	handleChange(e) {
@@ -29,6 +42,7 @@ export default class LoginPage extends React.Component {
 		})
 		.catch((error) => {
 			console.log(error);
+			this.setState({ errorMessage: error.response.data.message });
 		});
 	}
 
@@ -38,9 +52,17 @@ export default class LoginPage extends React.Component {
     }
 
   	render() {
+  		let errorMessage = '';
+  		
+  		if (this.state.errorMessage.length > 0) {
+  			errorMessage = <p>{this.state.errorMessage}</p>;
+  		} else if (!!this.props.location.state) {
+  			errorMessage = <p>{this.props.location.state.message}</p>;
+		}
+
 	    return (
 	        <div>
-	        	{!!this.props.location.state ? <p>{this.props.location.state.message}</p> : ""}
+	        	{errorMessage}
 				<h4>Username:</h4>
                 <input onChange={this.handleChange} type="text" name="username" />
 				<h4>Password:</h4>

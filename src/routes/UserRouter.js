@@ -185,7 +185,7 @@ export default class UserRouter {
     validateUser(req: $Request, res: $Response): void {
         const { body } = req;
         const username : string = body.username;
-        let errorMsg : string = 'User already exists';
+        let errorMsg : string = 'User already exists.';
 
         checkUserNameExists(username).then((data) => {
             if (!!data) {

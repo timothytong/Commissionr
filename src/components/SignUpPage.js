@@ -5,7 +5,6 @@ export default class SignUpPage extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-		    email: '',
 		    username: '',
 		    password: '',
 		    confirmedPassword: '',
@@ -20,7 +19,14 @@ export default class SignUpPage extends React.Component {
 	}
 
 	handleCreateAccountButtonClicked() {
-		if (this.state.password !== this.state.confirmedPassword) {
+		const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+		if (!this.state.email) {
+			this.setState({errorMessage: 'Email field is empty.'});
+		} else if (!this.state.email.match(emailRegex)) {
+			this.setState({errorMessage: 'Invalid email.'});
+		} else if (this.state.username.length < 3) {
+			this.setState({errorMessage: 'Username must be at least three characters.'});
+		} else if (this.state.password !== this.state.confirmedPassword) {
 			this.setState({errorMessage: 'Passwords do not match.'});
 		} else if (this.state.password.length < 6) {
 			this.setState({errorMessage: 'Passwords must be at least six characters.'});
@@ -33,15 +39,14 @@ export default class SignUpPage extends React.Component {
 			.then((response) => {
 				console.log(response);
 				this.setState({email: '', username: '', password: ''});
-				this.props.history.push('/', { message: 'User successfully created.' });
+				this.props.history.push('/', { message: response.data.message });
 			})
 			.catch((error) => {
 				console.log(error);
+				this.setState({ errorMessage: error.response.data.message });
 			});
 		}
 	}
-
-	
 
   	render() {
 	    return (

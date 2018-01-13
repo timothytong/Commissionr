@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import Navbar from './Navbar';
 
 export default class UserPostsPage extends React.Component {
     constructor(props) {
@@ -47,11 +48,19 @@ export default class UserPostsPage extends React.Component {
 
     render() {
         if (this.state.authenticated && !this.state.loading && !!this.state.posts) {
-            const logoutButton = (
-               <button type="button" onClick={this.handleLogoutButtonClicked}>
-                   Logout
-               </button>
-            );
+            const logout = () => {
+            	axios.get('http://localhost:3000/api/v1/user/logout')
+		        .then((response) => {
+		            console.log(response);
+		            this.props.history.push('/');
+		        })
+		        .catch((error) => {
+		            console.log(error);
+		        });
+            };
+            const login = () => {
+            	this.props.history.push('/');
+            };
             const postLayout = (
                 <ul>
                     {this.state.posts.map((post, index) => <li key={index}>{post.id} => {post.name}</li>)}
@@ -59,7 +68,7 @@ export default class UserPostsPage extends React.Component {
             );
             return (
                 <div>
-                    {logoutButton}
+                	<Navbar login={login} logout={logout} authenticated={this.state.authenticated}/>
                     {postLayout}
                 </div>
             );
