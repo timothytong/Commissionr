@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import Navbar from './Navbar';
+import PostsList from './PostsList';
 
 export default class UserHomePage extends React.Component {
     constructor(props) {
@@ -14,19 +15,9 @@ export default class UserHomePage extends React.Component {
     componentDidMount() {
         axios.get('http://localhost:3000/api/v1/user/session')
         .then((response) => {
+        	this.setState({loading: false});
             if (response.status === 200 || response.status === 304) {
                 this.setState({authenticated: true});
-                axios.get('http://localhost:3000/api/v1/post/userposts/2')
-                .then((response) => {
-                    this.setState({loading: false, posts: response.data.data});
-                    console.log(response);
-                })
-                .catch((error) => {
-                    this.setState({loading: false});
-                    console.log(error);
-                });
-            } else {
-                this.setState({authenticated: false});
             }
         })
         .catch((error) => {
@@ -47,7 +38,7 @@ export default class UserHomePage extends React.Component {
     }
 
     render() {
-        if (this.state.authenticated && !this.state.loading && !!this.state.posts) {
+        if (this.state.authenticated && !this.state.loading) {
             const logout = () => {
             	axios.get('http://localhost:3000/api/v1/user/logout')
 		        .then((response) => {
@@ -61,15 +52,10 @@ export default class UserHomePage extends React.Component {
             const login = () => {
             	this.props.history.push('/');
             };
-            const postLayout = (
-                <ul>
-                    {this.state.posts.map((post, index) => <li key={index}>{post.id} => {post.name}</li>)}
-                </ul>
-            );
             return (
                 <div>
                 	<Navbar login={login} logout={logout} authenticated={this.state.authenticated}/>
-                    {postLayout}
+                    <PostsList userId={1}/>
                 </div>
             );
         } else if (!this.state.authenticated) {
