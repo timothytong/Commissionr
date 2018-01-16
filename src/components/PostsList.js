@@ -11,7 +11,11 @@ export default class PostsList extends React.Component {
     }
 
     componentDidMount() {
-        axios.get('http://localhost:3000/api/v1/post/userposts/' + this.props.userId)
+        let url = 'http://localhost:3000/api/v1/post/logged-in-userposts/';
+        if (!!this.props.userId) {
+            url = 'http://localhost:3000/api/v1/post/userposts/' + this.props.userId;
+        }
+        axios.get(url)
         .then((response) => {
             this.setState({loading: false, posts: response.data.data});
             console.log(response);

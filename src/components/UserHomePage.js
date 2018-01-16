@@ -55,7 +55,7 @@ export default class UserHomePage extends React.Component {
             return (
                 <div>
                 	<Navbar login={login} logout={logout} authenticated={this.state.authenticated}/>
-                    <PostsList userId={1}/>
+                    <PostsList />
                 </div>
             );
         } else if (!this.state.authenticated) {

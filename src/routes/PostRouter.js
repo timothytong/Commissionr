@@ -53,8 +53,10 @@ export default class PostRouter {
         this.router.post('/create', this.createPost);
         this.router.delete('/delete/:id', this.deletePost);
         this.router.post('/edit/:id', this.editPost);
-        this.router.get('/:id', this.getPost);
         this.router.get('/userposts/:user_id', this.getUserPosts);
+        this.router.get('/logged-in-userposts', this.getLoggedInUserPosts);
+        this.router.get('/get/:id', this.getPost);
+
     }
 
     getPost(req: $Request, res: $Response): void {
@@ -95,10 +97,32 @@ export default class PostRouter {
             });
         }).catch((err) => {
             logger.error(errorMsg, err, err.message);
-            return res.status(500).json({message: errorMsg});
+            return res.status(400).json({message: errorMsg});
         });
     }
 
+    getLoggedInUserPosts(req: $Request, res: $Response): void {
+        const errorMsg : string = 'Unable to find posts.';
+
+        if (!!req.session.key) {
+            PostModels.postDb.findAll({
+                where: {
+                    submitter_user_id: req.session.key['id'],
+                }
+            }).then((data) => {
+                return res.status(200).json({
+                    data
+                });
+            }).catch((err) => {
+                logger.error(errorMsg, err, err.message);
+                return res.status(400).json({message: errorMsg});
+            });
+        } else {
+            return res.status(500).json({
+                message: 'User not authenticated.'
+            })
+        }
+    }
 
     deletePost(req: $Request, res: $Response): void {
         const postId = req.params.id;
