@@ -12,8 +12,8 @@ export default class PostsList extends React.Component {
 
     componentDidMount() {
         let url = 'http://localhost:3000/api/v1/post/logged-in-userposts/';
-        if (!!this.props.userId) {
-            url = 'http://localhost:3000/api/v1/post/userposts/' + this.props.userId;
+        if (!!this.props.username) {
+            url = 'http://localhost:3000/api/v1/post/userposts/' + this.props.username;
         }
         axios.get(url)
         .then((response) => {

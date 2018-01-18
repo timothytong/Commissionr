@@ -3,7 +3,7 @@ import axios from 'axios';
 import Navbar from './Navbar';
 import PostsList from './PostsList';
 
-export default class UserHomePage extends React.Component {
+export default class MyHomePage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -14,23 +14,29 @@ export default class UserHomePage extends React.Component {
     componentDidMount() {
         axios.get('http://localhost:3000/api/v1/user/session')
         .then((response) => {
-            this.setState({loading: false});
+        	this.setState({loading: false});
             if (response.status === 200 || response.status === 304) {
                 this.setState({authenticated: true});
             }
         })
         .catch((error) => {
             console.log(error);
-            this.setState({loading: false});
+            this.props.history.push('/');
         });
     }
 
     render() {
-        if (!this.state.loading) {
+        if (this.state.authenticated && !this.state.loading) {
             return (
                 <div>
-                    <Navbar history={this.props.history} authenticated={this.state.authenticated}/>
-                    <PostsList username={this.props.match.params.username}/>
+                	<Navbar history={this.props.history} authenticated={this.state.authenticated}/>
+                    <PostsList />
+                </div>
+            );
+        } else if (!this.state.authenticated) {
+            return (
+                <div>
+                    <h1>User not authenticated.</h1>
                 </div>
             );
         } else {

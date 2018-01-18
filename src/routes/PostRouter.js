@@ -53,7 +53,7 @@ export default class PostRouter {
         this.router.post('/create', this.createPost);
         this.router.delete('/delete/:id', this.deletePost);
         this.router.post('/edit/:id', this.editPost);
-        this.router.get('/userposts/:user_id', this.getUserPosts);
+        this.router.get('/userposts/:username', this.getUserPosts);
         this.router.get('/logged-in-userposts', this.getLoggedInUserPosts);
         this.router.get('/get/:id', this.getPost);
 
@@ -84,21 +84,39 @@ export default class PostRouter {
     }
 
     getUserPosts(req: $Request, res: $Response): void {
-        const userId = req.params.user_id;
-        const errorMsg : string = 'Unable to find posts.';
+        const username = req.params.username;
+        let errorMsg : string = 'Unable to find user.';
 
-        PostModels.postDb.findAll({
+        UserModels.userDb.findOne({
             where: {
-                submitter_user_id: userId,
+                user_name: username,
+                active: true,
             }
-        }).then((data) => {
-            return res.status(200).json({
-                data
-            });
+        }).then((user) => {
+             if (!!user) {
+                errorMsg = 'Unable to find posts.';
+                PostModels.postDb.findAll({
+                    where: {
+                        submitter_user_id: user.id,
+                    }
+                }).then((data) => {
+                    return res.status(200).json({
+                        data
+                    });
+                }).catch((err) => {
+                    logger.error(errorMsg, err, err.message);
+                    return res.status(400).json({message: errorMsg});
+                });
+            } else {
+                return res.status(404).json({
+                    message: 'User does not exist.'
+                });
+            }
         }).catch((err) => {
             logger.error(errorMsg, err, err.message);
-            return res.status(400).json({message: errorMsg});
+            return res.status(500).json({message: errorMsg});
         });
+
     }
 
     getLoggedInUserPosts(req: $Request, res: $Response): void {

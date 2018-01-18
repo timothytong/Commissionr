@@ -18,7 +18,7 @@ export default class LoginPage extends React.Component {
 		axios.get('http://localhost:3000/api/v1/user/session')
         .then((response) => {
             if (response.status === 200) {
-            	this.props.history.push('/homepage');
+            	this.props.history.push('/home');
             }
         })
         .catch((error) => {
@@ -38,7 +38,7 @@ export default class LoginPage extends React.Component {
 		.then((response) => {
 			console.log(response);
 			this.setState({username: '', password: ''});
-            this.props.history.push('/homepage');
+            this.props.history.push('/home');
 		})
 		.catch((error) => {
 			console.log(error);

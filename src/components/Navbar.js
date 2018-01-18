@@ -10,11 +10,18 @@ export default class Navbar extends React.Component {
 
 
     handleLogoutButtonClicked(e) {
-        this.props.logout();
+        axios.get('http://localhost:3000/api/v1/user/logout')
+        .then((response) => {
+            console.log(response);
+            this.props.history.push('/');
+        })
+        .catch((error) => {
+            console.log(error);
+        });
     }
 
     handleLoginButtonClicked(e) {
-        this.props.login();
+        this.props.history.push('/');
     }
 
     render() {
