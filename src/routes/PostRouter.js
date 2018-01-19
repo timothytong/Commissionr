@@ -79,7 +79,7 @@ export default class PostRouter {
             }
         }).catch((err) => {
             logger.error(errorMsg, err, err.message);
-            return res.status(500).json({message: errorMsg});
+            return res.status(401).json({message: errorMsg});
         });
     }
 
@@ -114,7 +114,7 @@ export default class PostRouter {
             }
         }).catch((err) => {
             logger.error(errorMsg, err, err.message);
-            return res.status(500).json({message: errorMsg});
+            return res.status(401).json({message: errorMsg});
         });
 
     }
@@ -136,7 +136,7 @@ export default class PostRouter {
                 return res.status(400).json({message: errorMsg});
             });
         } else {
-            return res.status(500).json({
+            return res.status(401).json({
                 message: 'User not authenticated.'
             })
         }
@@ -162,7 +162,7 @@ export default class PostRouter {
                         message: 'Successfully deleted post.',
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(401).json({
                         message: 'User not authenticated.'
                     });
                 }
@@ -174,7 +174,7 @@ export default class PostRouter {
                 });
             });
         } else {
-            return res.status(500).json({
+            return res.status(401).json({
                 message: 'User not authenticated.'
             })
         }
@@ -242,7 +242,7 @@ export default class PostRouter {
                 });
             })
         } else {
-            return res.status(500).json({
+            return res.status(401).json({
                 message: 'User not authenticated.'
             })
         }
@@ -302,7 +302,7 @@ export default class PostRouter {
                         message: 'Successfully edited post.',
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(401).json({
                         message: 'User not authenticated.'
                     });
                 }
@@ -314,7 +314,7 @@ export default class PostRouter {
                 });
             });
         } else {
-            return res.status(500).json({
+            return res.status(401).json({
                 message: 'User not authenticated.'
             })
         }

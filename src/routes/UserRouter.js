@@ -56,7 +56,7 @@ export default class UserRouter {
                 message: 'User is logged in',
             });
         } else {
-            return res.status(500).json({
+            return res.status(401).json({
                 message: 'User not logged in'
             })
         }
@@ -137,7 +137,7 @@ export default class UserRouter {
                 message: 'Successfully logged out.',
             });
         } else {
-            return res.status(500).json({
+            return res.status(401).json({
                 message: 'User not authenticated.'
             })
         }
@@ -176,7 +176,7 @@ export default class UserRouter {
                 });
             });
         } else {
-            return res.status(500).json({
+            return res.status(401).json({
                 message: 'User not authenticated.'
             })
         }

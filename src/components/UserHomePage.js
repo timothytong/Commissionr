@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import Navbar from './Navbar';
 import PostsList from './PostsList';
+import NewPostButton from './NewPostButton';
 
 export default class UserHomePage extends React.Component {
     constructor(props) {
@@ -31,6 +32,7 @@ export default class UserHomePage extends React.Component {
                 <div>
                     <Navbar history={this.props.history} authenticated={this.state.authenticated}/>
                     <PostsList username={this.props.match.params.username}/>
+                    <NewPostButton history={this.props.history}/>
                 </div>
             );
         } else {
@@ -40,8 +42,8 @@ export default class UserHomePage extends React.Component {
                 </div>
             );
         }
-
     }
+
 }
 
 // LESSONS LEARNED
@@ -52,3 +54,4 @@ export default class UserHomePage extends React.Component {
 // 5. return different UI under different conditions
 // 6. Use this.props.history.push to navigate users to desired page
 // 7. If communicating with backend at all, use Axios
+// 8. Teach NewPostButton history so that the NewPostButton component knows what history comes from
