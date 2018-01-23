@@ -2,6 +2,7 @@
 
 import PostDb from './PostDb';
 import UserDb from '../user/UserDb';
+import AttributeDb from '../attribute/AttributeDb';
 
 // define DB relationships
 PostDb.belongsTo(UserDb, {
@@ -13,6 +14,11 @@ PostDb.belongsTo(UserDb, {
     foreignKey: 'found_user_id',
     targetKey: 'id',
     as: 'finder',
+});
+PostDb.hasMany(AttributeDb, {
+    foreignKey: 'post_id',
+    sourceKey: 'id',
+    as: 'additional_attributes',
 });
 
 export default {

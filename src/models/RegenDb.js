@@ -1,5 +1,6 @@
 import UserModels from './user';
 import PostModels from './post';
+import AttributeModels from './attribute';
 import Database from './Database';
 
 export default function () {
@@ -83,5 +84,27 @@ export default function () {
         		submitter_user_id: 3
         	}
         ]))
+        .then(() => AttributeModels.attributeDb.bulkCreate([
+            {
+                id: 1, 
+                key: 'sashimi', 
+                value: 'salmon', 
+                post_id: 1, 
+            },
+            {
+                id: 2, 
+                key: 'cringe', 
+                value: 'furry', 
+                post_id: 2, 
+            },
+            {
+                id: 3, 
+                key: 'oh hai', 
+                value: 'mark', 
+                post_id: 2, 
+            }
+            
+        ]))
         .catch((e) => console.log('Error: ' + e + '\nHint: Is your postgres running?'));
+
 }

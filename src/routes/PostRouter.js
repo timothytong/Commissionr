@@ -6,6 +6,7 @@ import Logger from '../utils/Logger';
 import { Router }  from 'express';
 import UserModels from '../models/user';
 import PostModels from '../models/post';
+import AttributeModels from '../models/attribute';
 import bcrypt from 'bcryptjs';
 
 type CreatePostParams = {
@@ -66,7 +67,14 @@ export default class PostRouter {
         PostModels.postDb.findOne({
             where: {
                 id: postId,
-            }
+            },
+            include: [
+                {
+                    model: AttributeModels.attributeDb,
+                    as: 'additional_attributes',
+                    attributes: {exclude: ['id', 'post_id']},
+                },
+            ],
         }).then((data) => {
             if (!!data) {
                 return res.status(200).json({
@@ -98,7 +106,14 @@ export default class PostRouter {
                 PostModels.postDb.findAll({
                     where: {
                         submitter_user_id: user.id,
-                    }
+                    },
+                    include: [
+                        {
+                            model: AttributeModels.attributeDb,
+                            as: 'additional_attributes',
+                            attributes: {exclude: ['id', 'post_id']},
+                        },
+                    ],
                 }).then((data) => {
                     return res.status(200).json({
                         data
@@ -126,7 +141,14 @@ export default class PostRouter {
             PostModels.postDb.findAll({
                 where: {
                     submitter_user_id: req.session.key['id'],
-                }
+                },
+                include: [
+                    {
+                        model: AttributeModels.attributeDb,
+                        as: 'additional_attributes',
+                        attributes: {exclude: ['id', 'post_id']},
+                    },
+                ],
             }).then((data) => {
                 return res.status(200).json({
                     data
@@ -254,7 +276,7 @@ export default class PostRouter {
         const { body } = req;
         const params : UpdatePostParams = {
             name: body.name,
-            last_aeen: body.lastSeen,
+            last_seen: body.lastSeen,
             reward: body.reward,
             longitude: body.longitude,
             latitude: body.latitude,
