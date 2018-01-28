@@ -67,6 +67,7 @@ export default class PostRouter {
         PostModels.postDb.findOne({
             where: {
                 id: postId,
+                deleted: false,
             },
             include: [
                 {
@@ -99,6 +100,7 @@ export default class PostRouter {
             where: {
                 user_name: username,
                 active: true,
+                deleted: false,
             }
         }).then((user) => {
              if (!!user) {
@@ -141,6 +143,7 @@ export default class PostRouter {
             PostModels.postDb.findAll({
                 where: {
                     submitter_user_id: req.session.key['id'],
+                    deleted: false,
                 },
                 include: [
                     {

@@ -36,7 +36,18 @@ export default class PostsList extends React.Component {
         } else if (!!this.state.posts) {
             return (
                 <ul>
-                    {this.state.posts.map((post, index) => <li key={index}>{post.id} => {post.name}</li>)}
+                    {this.state.posts.map((post, index) => 
+                        <li key={index}>
+                            {post.id}: looking for {post.name}
+                            <ul>
+                                {post.additional_attributes.map((attr, index) => 
+                                    <li key={index}>
+                                        {attr.key} => {attr.value}
+                                    </li>
+                                )}
+                            </ul>
+                        </li>
+                    )}
                 </ul>
             );
         } else {
