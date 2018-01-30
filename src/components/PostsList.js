@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import DeleteButton from './DeleteButton';
 
 export default class PostsList extends React.Component {
 
@@ -8,6 +9,7 @@ export default class PostsList extends React.Component {
         this.state = {
             loading: true,
         };
+        this.deletePost = this.deletePost.bind(this);
     }
 
     componentDidMount() {
@@ -26,6 +28,11 @@ export default class PostsList extends React.Component {
         });
     }
 
+    deletePost(index) {
+        const newPosts = this.state.posts.slice(0,index).concat(this.state.posts.slice(index+1));
+        this.setState({posts: newPosts});
+    }
+
     render() {
         if (this.state.loading) {
             return (
@@ -39,6 +46,7 @@ export default class PostsList extends React.Component {
                     {this.state.posts.map((post, index) => 
                         <li key={index}>
                             {post.id}: looking for {post.name}
+                            <DeleteButton deletePost={this.deletePost} postId={post.id} postIndex={index}/>
                             <ul>
                                 {post.additional_attributes.map((attr, index) => 
                                     <li key={index}>

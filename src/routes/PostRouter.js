@@ -182,8 +182,7 @@ export default class PostRouter {
                 returns: true,
             }).then((data) => {
                 if (data[0] > 0) { 
-                    delete req.session.key;
-                    return res.status(200).json({
+                    return res.status(202).json({
                         message: 'Successfully deleted post.',
                     });
                 } else {
