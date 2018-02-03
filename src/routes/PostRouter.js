@@ -21,7 +21,7 @@ type CreatePostParams = {
     animal: string,
     breed: string,
     isAggressive: boolean,
-    completed_shots: boolean,
+    completedShots: boolean,
     hasChip: boolean,
     found: boolean,
     foundUserId: integer,
@@ -208,7 +208,6 @@ export default class PostRouter {
     createPost(req: $Request, res: $Response): void {
         const { body } = req;
         const params : CreatePostParams = {
-            id: body.id,
             name: body.name,
             lastSeen: body.lastSeen,
             reward: body.reward,
@@ -221,10 +220,7 @@ export default class PostRouter {
             isAggressive: body.isAggressive,
             completedShots: body.completedShots,
             hasChip: body.hasChip,
-            found: body.found,
-            foundUserId: body.foundUserId,
-            deleted: body.deleted,
-            submitterUserId: body.submitterUserId,
+            submitterUserId: req.session.key['id'],
         };
 
         let errorMsg : string = 'Unable to create post.';
@@ -237,7 +233,6 @@ export default class PostRouter {
 
         if (!!req.session.key) {
             PostModels.postDb.create({
-                id: params.id,
                 name: params.name,
                 last_seen: params.lastSeen,
                 reward: params.reward,
@@ -250,9 +245,6 @@ export default class PostRouter {
                 is_aggressive: params.isAggressive,
                 completed_shots: params.completedShots,
                 has_chip: params.hasChip,
-                found: params.found,
-                found_user_id: params.foundUserId,
-                deleted: params.deleted,
                 submitter_user_id: params.submitterUserId,
             }).then((data) => {
                 return res.status(200).json({

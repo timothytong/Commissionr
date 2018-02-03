@@ -1,5 +1,8 @@
 import React from 'react';
 import axios from 'axios';
+import DatePicker from 'react-datepicker';
+import moment from 'moment';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export default class NewPostPage extends React.Component {
 
@@ -7,21 +10,44 @@ export default class NewPostPage extends React.Component {
 		super(props);
 		this.state = {
 		    errorMessage: '',
+		    post: {
+		    	isAggressive: false,
+		    	completedShots: false,
+		    	hasChip: false,
+		    },
 		};
 		this.handleChange = this.handleChange.bind(this);
 		this.handleCreatePostButtonClicked = this.handleCreatePostButtonClicked.bind(this);
+		this.handleDatePickerChange = this.handleDatePickerChange.bind(this);
 	}
 
 	handleChange(e) {
+		const updatedPost = { ...this.state.post };
 		if (e.target.type === 'checkbox') {
-			this.setState({[e.target.name]: e.target.checked});
+			updatedPost[e.target.name] = e.target.checked;
 		} else {
-			this.setState({[e.target.name]: e.target.value});
+			updatedPost[e.target.name] = e.target.value;
 		}
+		this.setState({ post: updatedPost });
 	}
 
-	handleCreatePostButtonClicked() {
+	handleDatePickerChange(date) {
+		const updatedPost = { ...this.state.post };
+		updatedPost.lastSeen = date;
+    	this.setState({ post: updatedPost });
+  	}
 
+	handleCreatePostButtonClicked() {
+		axios.post('http://localhost:3000/api/v1/post/create/', this.state.post)
+        .then((response) => {
+            if (response.status === 200 || response.status === 201) {
+                console.log('Successfully created.');
+                this.props.history.push('/', { message: response.data.message });
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+        });
 	}
 
   	render() {
@@ -32,7 +58,7 @@ export default class NewPostPage extends React.Component {
 		        	<h6>Name: </h6> 
 		        	<input onChange={this.handleChange} type='text' name='name'/>
 		        	<h6>Last Seen: </h6>
-		        	<input onChange={this.handleChange} type='text' name='lastSeen'/>
+		        	<DatePicker selected={this.state.post.lastSeen} onChange={this.handleDatePickerChange}/>
 		        	<h6>Reward: </h6>
 		        	<input onChange={this.handleChange} type='text' name='reward'/>
 		        	<h6>Longitude: </h6>
@@ -44,13 +70,15 @@ export default class NewPostPage extends React.Component {
 		        	<h6>Description: </h6>
 		        	<input onChange={this.handleChange} type='text' name='description'/>
 		        	<h6>Species: </h6>
-		        	<input onChange={this.handleChange} type='text' name='species'/>
+		        	<input onChange={this.handleChange} type='text' name='animal'/>
 		        	<h6>Breed: </h6>
 		        	<input onChange={this.handleChange} type='text' name='breed'/>
 		        	<h6>Aggressive: </h6>
-		        	<input onChange={this.handleChange} type='checkbox' name='aggressive'/>
+		        	<input onChange={this.handleChange} type='checkbox' name='isAggressive'/>
+		        	<h6>Completed Shots: </h6>
+		        	<input onChange={this.handleChange} type='checkbox' name='completedShots'/>
 		        	<h6>Chip: </h6>
-		        	<input onChange={this.handleChange} type='checkbox' name='chip'/>
+		        	<input onChange={this.handleChange} type='checkbox' name='hasChip'/>
 		        	<button type="button" onClick={this.handleCreatePostButtonClicked}>Create post</button>
 	        	</div>
 			</div>
