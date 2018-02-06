@@ -23,6 +23,8 @@
     "prop-types": "^15.5.10",
     "react-datepicker": "^0.56.0",
     "react-dropzone": "^3.13.2",
+    "react-geosuggest": "^2.7.0",
+    "react-location-picker": "^1.0.1",
     "react-modal": "^3.0.4",
     "react-router": "^4.2.0",
     "redis": "^2.7.1",

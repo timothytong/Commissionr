@@ -3,6 +3,7 @@ import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
+import Geosuggest from 'react-geosuggest';
 
 export default class NewPostPage extends React.Component {
 
@@ -19,6 +20,8 @@ export default class NewPostPage extends React.Component {
 		this.handleChange = this.handleChange.bind(this);
 		this.handleCreatePostButtonClicked = this.handleCreatePostButtonClicked.bind(this);
 		this.handleDatePickerChange = this.handleDatePickerChange.bind(this);
+		this.handleLocationChange = this.handleLocationChange.bind(this);
+		this.onSuggestSelect = this.onSuggestSelect.bind(this);
 	}
 
 	handleChange(e) {
@@ -50,6 +53,11 @@ export default class NewPostPage extends React.Component {
         });
 	}
 
+	onSuggestSelect(suggest) {
+	    this.setState({ position: suggest.location });
+	    console.log(suggest);
+	}
+
   	render() {
 	    return (
 	        <div>
@@ -61,10 +69,15 @@ export default class NewPostPage extends React.Component {
 		        	<DatePicker selected={this.state.post.lastSeen} onChange={this.handleDatePickerChange}/>
 		        	<h6>Reward: </h6>
 		        	<input onChange={this.handleChange} type='text' name='reward'/>
-		        	<h6>Longitude: </h6>
-		        	<input onChange={this.handleChange} type='text' name='longitude'/>
-		        	<h6>Latitude: </h6>
-		        	<input onChange={this.handleChange} type='text' name='latitude'/>
+		        	<div>
+				        <Geosuggest
+				            ref={el=>this._geoSuggest=el}
+				            placeholder="Location"
+				            onSuggestSelect={this.onSuggestSelect}
+				            location={new google.maps.LatLng(53.558572, 9.9278215)}
+				            radius="20" 
+				        />
+			      	</div>
 		        	<h6>Contact: </h6>
 		        	<input onChange={this.handleChange} type='text' name='contact'/>
 		        	<h6>Description: </h6>
