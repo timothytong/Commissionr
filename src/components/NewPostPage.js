@@ -16,11 +16,14 @@ export default class NewPostPage extends React.Component {
 		    	completedShots: false,
 		    	hasChip: false,
 		    },
+		    additionalAttrs: [],
 		};
 		this.handleChange = this.handleChange.bind(this);
 		this.handleCreatePostButtonClicked = this.handleCreatePostButtonClicked.bind(this);
 		this.handleDatePickerChange = this.handleDatePickerChange.bind(this);
-		this.handleLocationChange = this.handleLocationChange.bind(this);
+		this.handleCreateNewAttributeClicked = this.handleCreateNewAttributeClicked.bind(this);
+		this.handleDeleteAttribute = this.handleDeleteAttribute.bind(this);
+		this.handleAttributeChange = this.handleAttributeChange.bind(this);
 		this.onSuggestSelect = this.onSuggestSelect.bind(this);
 	}
 
@@ -58,6 +61,24 @@ export default class NewPostPage extends React.Component {
 	    console.log(suggest);
 	}
 
+	handleCreateNewAttributeClicked() {
+		const newAdditionalAttrs = [ ...this.state.additionalAttrs ];
+		newAdditionalAttrs.push(Math.random());
+		this.setState({ additionalAttrs: newAdditionalAttrs });
+	}
+
+	handleDeleteAttribute(index) {
+		const attributes = this.state.additionalAttrs.slice(0,index).concat(this.state.additionalAttrs.slice(index+1));
+        this.setState({ additionalAttrs: attributes });
+	}
+
+	handleAttributeChange(e) {
+		debugger
+		const newAdditionalAttrs = [ ...this.state.additionalAttrs ];
+		newAdditionalAttrs[parseInt(e.target.name)] = e.target.value;
+		this.setState({ additionalAttrs: newAdditionalAttrs });
+	}
+
   	render() {
 	    return (
 	        <div>
@@ -92,8 +113,19 @@ export default class NewPostPage extends React.Component {
 		        	<input onChange={this.handleChange} type='checkbox' name='completedShots'/>
 		        	<h6>Chip: </h6>
 		        	<input onChange={this.handleChange} type='checkbox' name='hasChip'/>
-		        	<button type="button" onClick={this.handleCreatePostButtonClicked}>Create post</button>
+			        <ul>	
+			        	{this.state.additionalAttrs.map((attr, index) => 
+	                        <li key={index}>
+		                        <h6>{attr}</h6>
+				        		<input value={attr} name={index} onChange={this.handleAttributeChange} type='text'/>
+				        		<input value={attr} name={index} onChange={this.handleAttributeChange} type='text'/>
+				        		<button type="button" onClick={() => this.handleDeleteAttribute(index)}>X</button>
+				        	</li>
+	                    )}
+	                </ul>
+		        	<button type="button" onClick={this.handleCreateNewAttributeClicked}>Add attribute</button>
 	        	</div>
+	        	<button type="button" onClick={this.handleCreatePostButtonClicked}>Create post</button>
 			</div>
 	    );
   	}
