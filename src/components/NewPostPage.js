@@ -63,7 +63,7 @@ export default class NewPostPage extends React.Component {
 
 	handleCreateNewAttributeClicked() {
 		const newAdditionalAttrs = [ ...this.state.additionalAttrs ];
-		newAdditionalAttrs.push(Math.random());
+		newAdditionalAttrs.push({ key: '', value: '' });
 		this.setState({ additionalAttrs: newAdditionalAttrs });
 	}
 
@@ -73,9 +73,10 @@ export default class NewPostPage extends React.Component {
 	}
 
 	handleAttributeChange(e) {
-		debugger
 		const newAdditionalAttrs = [ ...this.state.additionalAttrs ];
-		newAdditionalAttrs[parseInt(e.target.name)] = e.target.value;
+		const name = e.target.name;
+		const parts = name.split('|');
+		newAdditionalAttrs[parseInt(parts[0])][parts[1]] = e.target.value;
 		this.setState({ additionalAttrs: newAdditionalAttrs });
 	}
 
@@ -116,9 +117,8 @@ export default class NewPostPage extends React.Component {
 			        <ul>	
 			        	{this.state.additionalAttrs.map((attr, index) => 
 	                        <li key={index}>
-		                        <h6>{attr}</h6>
-				        		<input value={attr} name={index} onChange={this.handleAttributeChange} type='text'/>
-				        		<input value={attr} name={index} onChange={this.handleAttributeChange} type='text'/>
+				        		<input value={attr.key} name={index + '|key'} onChange={this.handleAttributeChange} type='text'/>
+				        		<input value={attr.value} name={index + '|value'} onChange={this.handleAttributeChange} type='text'/>
 				        		<button type="button" onClick={() => this.handleDeleteAttribute(index)}>X</button>
 				        	</li>
 	                    )}
