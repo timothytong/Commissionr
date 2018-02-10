@@ -10,7 +10,6 @@ import AttributeModels from '../models/attribute';
 import bcrypt from 'bcryptjs';
 
 type CreatePostParams = {
-    id: integer,
     name: string,
     lastSeen: date,
     reward: float,
@@ -23,10 +22,7 @@ type CreatePostParams = {
     isAggressive: boolean,
     completedShots: boolean,
     hasChip: boolean,
-    found: boolean,
-    foundUserId: integer,
-    deleted: boolean,
-    submitterUserId: integer,
+    submitterUserId: number,
 };
 
 const logger = new Logger();
@@ -247,8 +243,21 @@ export default class PostRouter {
                 has_chip: params.hasChip,
                 submitter_user_id: params.submitterUserId,
             }).then((data) => {
-                return res.status(200).json({
-                    message: 'Post created.',
+                const additionalAttributes = body.additionalAttributes.map((attr) => {
+                    attr.post_id = data.id;
+                    return attr;
+                });
+                AttributeModels.attributeDb.bulkCreate(additionalAttributes, {individualHooks: true})
+                .then((data) => {
+                    return res.status(200).json({
+                        message: 'Post created.',
+                    });
+                }).catch((err) => {
+                    logger.error(errorMsg, err, err.message);
+                    return res.status(400).json({
+                        message: errorMsg,
+                        error: err.message,
+                    });
                 });
             }).catch((err) => {
                 logger.error(errorMsg, err, err.message);

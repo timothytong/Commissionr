@@ -15,6 +15,8 @@ export default class NewPostPage extends React.Component {
 		    	isAggressive: false,
 		    	completedShots: false,
 		    	hasChip: false,
+		    	latitude: 15,
+		    	longitude: 25,
 		    },
 		    additionalAttrs: [],
 		};
@@ -44,7 +46,9 @@ export default class NewPostPage extends React.Component {
   	}
 
 	handleCreatePostButtonClicked() {
-		axios.post('http://localhost:3000/api/v1/post/create/', this.state.post)
+		const data = { ...this.state.post };
+		data.additionalAttributes = this.state.additionalAttrs;
+		axios.post('http://localhost:3000/api/v1/post/create/', data)
         .then((response) => {
             if (response.status === 200 || response.status === 201) {
                 console.log('Successfully created.');
