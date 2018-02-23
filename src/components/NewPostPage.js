@@ -15,8 +15,6 @@ export default class NewPostPage extends React.Component {
 		    	isAggressive: false,
 		    	completedShots: false,
 		    	hasChip: false,
-		    	latitude: 15,
-		    	longitude: 25,
 		    },
 		    additionalAttrs: [],
 		};
@@ -61,8 +59,10 @@ export default class NewPostPage extends React.Component {
 	}
 
 	onSuggestSelect(suggest) {
-	    this.setState({ position: suggest.location });
-	    console.log(suggest);
+		const updatedPost = { ...this.state.post };
+		updatedPost.latitude = suggest.location.lat;
+		updatedPost.longitude = suggest.location.lng;
+	    this.setState({ post: updatedPost });
 	}
 
 	handleCreateNewAttributeClicked() {
@@ -96,6 +96,7 @@ export default class NewPostPage extends React.Component {
 		        	<h6>Reward: </h6>
 		        	<input onChange={this.handleChange} type='text' name='reward'/>
 		        	<div>
+		        		<h6>Location: </h6>
 				        <Geosuggest
 				            ref={el=>this._geoSuggest=el}
 				            placeholder="Location"
