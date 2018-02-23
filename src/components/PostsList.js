@@ -1,7 +1,6 @@
 import React from 'react';
 import axios from 'axios';
 import DeleteButton from './DeleteButton';
-import geocoder from 'geocoder';
 
 export default class PostsList extends React.Component {
 
@@ -46,22 +45,19 @@ export default class PostsList extends React.Component {
                 <ul>
                     {
                         this.state.posts.map((post, index) => {
-                            return geocoder.reverseGeocode( 33.7489, -84.3789, (err, data) => {
-                                debugger
-                                return (
-                                    <li key={index}>
-                                        {post.id}: looking for {post.name}
-                                        <DeleteButton deletePost={this.deletePost} postId={post.id} postIndex={index}/>
-                                        <ul>
-                                            {post.additional_attributes.map((attr, index) => 
-                                                <li key={index}>
-                                                    {attr.key} => {attr.value}
-                                                </li>
-                                            )}
-                                        </ul>
-                                    </li>
-                                );
-                            });
+                            return (
+                                <li key={index}>
+                                    {post.id}: looking for {post.name}
+                                    <DeleteButton deletePost={this.deletePost} postId={post.id} postIndex={index}/>
+                                    <ul>
+                                        {post.additional_attributes.map((attr, index) =>
+                                            <li key={index}>
+                                                {attr.key} => {attr.value}
+                                            </li>
+                                        )}
+                                    </ul>
+                                </li>
+                            );
                         })
                     }
                 </ul>
