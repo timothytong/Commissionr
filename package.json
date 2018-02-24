@@ -5,6 +5,7 @@
   "author": "John Hughes, Timothy Tong",
   "license": "MIT",
   "dependencies": {
+    "@google/maps": "^0.4.5",
     "axios": "^0.17.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.17.1",

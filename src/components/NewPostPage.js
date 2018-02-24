@@ -55,14 +55,17 @@ export default class NewPostPage extends React.Component {
         })
         .catch((error) => {
             console.log(error);
+            this.setState({ errorMessage: error.response.data.error.replace(/notNull Violation: /g,"")});
         });
 	}
 
 	onSuggestSelect(suggest) {
-		const updatedPost = { ...this.state.post };
-		updatedPost.latitude = suggest.location.lat;
-		updatedPost.longitude = suggest.location.lng;
-	    this.setState({ post: updatedPost });
+		if (suggest.location.lat !== 0 || suggest.location.lng !==0){
+			const updatedPost = { ...this.state.post };
+			updatedPost.latitude = suggest.location.lat;
+			updatedPost.longitude = suggest.location.lng;
+		    this.setState({ post: updatedPost });
+		}
 	}
 
 	handleCreateNewAttributeClicked() {
@@ -89,6 +92,7 @@ export default class NewPostPage extends React.Component {
 	        <div>
 	        	<h1>New Post Page</h1>
 	        	<div>
+	        		{this.state.errorMessage.length > 0 ? <p>{this.state.errorMessage}</p> : ""}
 		        	<h6>Name: </h6> 
 		        	<input onChange={this.handleChange} type='text' name='name'/>
 		        	<h6>Last Seen: </h6>
@@ -101,7 +105,7 @@ export default class NewPostPage extends React.Component {
 				            ref={el=>this._geoSuggest=el}
 				            placeholder="Location"
 				            onSuggestSelect={this.onSuggestSelect}
-				            location={new google.maps.LatLng(53.558572, 9.9278215)}
+				            location={new google.maps.LatLng(0, 0)}
 				            radius="20" 
 				        />
 			      	</div>
