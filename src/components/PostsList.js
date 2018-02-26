@@ -48,7 +48,7 @@ export default class PostsList extends React.Component {
                         this.state.posts.map((post, index) => {
                             return (
                                 <li key={index}>
-                                    {post.id}: looking for {post.name} around {post.formattedAddress}
+                                    {post.id}: looking for {post.name} around {post.formatted_address}
                                     <DeleteButton deletePost={this.deletePost} postId={post.id} postIndex={index}/>
                                     <ul>
                                         {post.additional_attributes.map((attr, index) =>

@@ -46,9 +46,9 @@ export default class PostRouter {
         this.googleClient = googleMapsClient;
         this.path = path;
         // glue it all together
+        this.createPost = this.createPost.bind(this);
         this.init();
     }
-
 
     /**
     * Attach route handlers to their endpoints.
@@ -60,7 +60,6 @@ export default class PostRouter {
         this.router.get('/userposts/:username', this.getUserPosts);
         this.router.get('/logged-in-userposts', this.getLoggedInUserPosts);
         this.router.get('/get/:id', this.getPost);
-
     }
 
     getPost(req: $Request, res: $Response): void {
@@ -207,7 +206,7 @@ export default class PostRouter {
         }
     }
 
-    reverseGeocode(post: CreatePostParams) {
+    reverseGeocode(post: CreatePostParams, onComplete: (Object) => void) {
         return this.googleClient.reverseGeocode({
             latlng: [post.latitude, post.longitude],
         }, (error, data) => {
@@ -217,6 +216,7 @@ export default class PostRouter {
                 const rawData = `Latitude (${post.latitude}), Longitude (${post.longitude})`;
                 post.formattedAddress = rawData;
             }
+            onComplete(post);
         });
     }
 
@@ -237,40 +237,45 @@ export default class PostRouter {
             hasChip: body.hasChip,
             submitterUserId: req.session.key['id'],
         };
-        this.reverseGeocode(params);
-        let errorMsg : string = 'Unable to create post.';
-
         if (params.longitude < -180 || params.longitude > 180 || params.latitude < -90 || params.latitude > 90) {
             return res.status(400).json({
                 message: 'Invalid longitude-latitude combination.',
             });
         }
-
-        if (!!req.session.key) {
-            PostModels.postDb.create({
-                name: params.name,
-                last_seen: params.lastSeen,
-                reward: params.reward,
-                longitude: params.longitude,
-                latitude: params.latitude,
-                contact: params.contact,
-                description: params.description,
-                animal: params.animal,
-                breed: params.breed,
-                is_aggressive: params.isAggressive,
-                completed_shots: params.completedShots,
-                has_chip: params.hasChip,
-                formatted_address: params.formattedAddress,
-                submitter_user_id: params.submitterUserId,
-            }).then((data) => {
-                const additionalAttributes = body.additionalAttributes.map((attr) => {
-                    attr.post_id = data.id;
-                    return attr;
-                });
-                AttributeModels.attributeDb.bulkCreate(additionalAttributes, {individualHooks: true})
-                .then((data) => {
-                    return res.status(200).json({
-                        message: 'Post created.',
+        this.reverseGeocode(params, (post) => {
+            let errorMsg : string = 'Unable to create post.';
+            if (!!req.session.key) {
+                PostModels.postDb.create({
+                    name: post.name,
+                    last_seen: post.lastSeen,
+                    reward: post.reward,
+                    longitude: post.longitude,
+                    latitude: post.latitude,
+                    contact: post.contact,
+                    description: post.description,
+                    animal: post.animal,
+                    breed: post.breed,
+                    is_aggressive: post.isAggressive,
+                    completed_shots: post.completedShots,
+                    has_chip: post.hasChip,
+                    formatted_address: post.formattedAddress,
+                    submitter_user_id: post.submitterUserId,
+                }).then((data) => {
+                    const additionalAttributes = body.additionalAttributes.map((attr) => {
+                        attr.post_id = data.id;
+                        return attr;
+                    });
+                    AttributeModels.attributeDb.bulkCreate(additionalAttributes, {individualHooks: true})
+                    .then((data) => {
+                        return res.status(200).json({
+                            message: 'Post created.',
+                        });
+                    }).catch((err) => {
+                        logger.error(errorMsg, err, err.message);
+                        return res.status(400).json({
+                            message: errorMsg,
+                            error: err.message,
+                        });
                     });
                 }).catch((err) => {
                     logger.error(errorMsg, err, err.message);
@@ -278,20 +283,13 @@ export default class PostRouter {
                         message: errorMsg,
                         error: err.message,
                     });
-                });
-            }).catch((err) => {
-                logger.error(errorMsg, err, err.message);
-                return res.status(400).json({
-                    message: errorMsg,
-                    error: err.message,
-                });
-            })
-        } else {
-            return res.status(401).json({
-                message: 'User not authenticated.'
-            })
-        }
-
+                })
+            } else {
+                return res.status(401).json({
+                    message: 'User not authenticated.'
+                })
+            }
+        });
     }
 
     editPost(req: $Request, res: $Response): void {
