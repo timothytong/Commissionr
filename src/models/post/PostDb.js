@@ -74,6 +74,10 @@ const PostDb = Database.define(POSTS_TABLE, {
             model: UserModels.userDb,
         }
     },
+    formatted_address: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
     deleted: {
         type: DataTypes.BOOLEAN,
         allowNull: false,

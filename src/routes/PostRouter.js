@@ -8,6 +8,7 @@ import UserModels from '../models/user';
 import PostModels from '../models/post';
 import AttributeModels from '../models/attribute';
 import bcrypt from 'bcryptjs';
+import googleMaps from '@google/maps';
 
 type CreatePostParams = {
     name: string,
@@ -22,6 +23,7 @@ type CreatePostParams = {
     isAggressive: boolean,
     completedShots: boolean,
     hasChip: boolean,
+    formattedAddress: string,
     submitterUserId: number,
 };
 
@@ -32,11 +34,16 @@ export default class PostRouter {
     // these fields must be type annotated, or Flow will complain!
     router: Router;
     path: string;
+    googleClient: Object;
 
     // take the mount path as the constructor argument
     constructor(path = '/api/v1/post') {
         // instantiate the express.Router
         this.router = Router();
+        const googleMapsClient = googleMaps.createClient({
+            key: 'AIzaSyCqdarCsFQeR7h6Kl643pyk6c8sXxlkHO0'
+        });
+        this.googleClient = googleMapsClient;
         this.path = path;
         // glue it all together
         this.init();
@@ -198,7 +205,19 @@ export default class PostRouter {
                 message: 'User not authenticated.'
             })
         }
-      
+    }
+
+    reverseGeocode(post: CreatePostParams) {
+        return this.googleClient.reverseGeocode({
+            latlng: [post.latitude, post.longitude],
+        }, (error, data) => {
+            if (error === null && data.json.results.length !== 0) {
+                post.formattedAddress = data.json.results[0].formatted_address;
+            } else {
+                const rawData = `Latitude (${post.latitude}), Longitude (${post.longitude})`;
+                post.formattedAddress = rawData;
+            }
+        });
     }
 
     createPost(req: $Request, res: $Response): void {
@@ -218,7 +237,7 @@ export default class PostRouter {
             hasChip: body.hasChip,
             submitterUserId: req.session.key['id'],
         };
-
+        this.reverseGeocode(params);
         let errorMsg : string = 'Unable to create post.';
 
         if (params.longitude < -180 || params.longitude > 180 || params.latitude < -90 || params.latitude > 90) {
@@ -241,6 +260,7 @@ export default class PostRouter {
                 is_aggressive: params.isAggressive,
                 completed_shots: params.completedShots,
                 has_chip: params.hasChip,
+                formatted_address: params.formattedAddress,
                 submitter_user_id: params.submitterUserId,
             }).then((data) => {
                 const additionalAttributes = body.additionalAttributes.map((attr) => {

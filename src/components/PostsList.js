@@ -1,18 +1,13 @@
 import React from 'react';
 import axios from 'axios';
 import DeleteButton from './DeleteButton';
-import googleMaps from '@google/maps';
 
 export default class PostsList extends React.Component {
 
     constructor(props) {
         super(props);
-        const googleMapsClient = googleMaps.createClient({
-            key: 'AIzaSyCqdarCsFQeR7h6Kl643pyk6c8sXxlkHO0'
-        });
         this.state = {
             loading: true,
-            googleClient: googleMapsClient,
         };
         this.deletePost = this.deletePost.bind(this);
     }
@@ -25,19 +20,6 @@ export default class PostsList extends React.Component {
         axios.get(url)
         .then((response) => {
             const posts = response.data.data;
-            posts.map((post) => {
-                this.state.googleClient.reverseGeocode({
-                    latlng: [post.latitude, post.longitude],
-                }, (error, data) => {
-                    if (error === null && data.json.results.length !== 0) {
-                        post.formattedAddress = data.json.results[0].formatted_address;
-                    } else {
-                        const rawData = `Latitude (${post.latitude}), Longitude (${post.longitude})`;
-                        post.formattedAddress = rawData;
-                    }
-                    this.forceUpdate();
-                });
-            });
             this.setState({loading: false, posts: posts});
             console.log(response);
         })
