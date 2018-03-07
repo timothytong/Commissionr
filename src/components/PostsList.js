@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import DeleteButton from './DeleteButton';
+import { Link } from 'react-router-dom';
 
 export default class PostsList extends React.Component {
 
@@ -49,6 +50,12 @@ export default class PostsList extends React.Component {
                             return (
                                 <li key={index}>
                                     {post.id}: looking for {post.name} around {post.formatted_address}
+                                    <Link to={{
+                                        pathname: '/post/edit',
+                                        state: { post: post }
+                                    }}>
+                                        Edit
+                                    </Link>
                                     <DeleteButton deletePost={this.deletePost} postId={post.id} postIndex={index}/>
                                     <ul>
                                         {post.additional_attributes.map((attr, index) =>

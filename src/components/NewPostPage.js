@@ -17,6 +17,7 @@ export default class NewPostPage extends React.Component {
 		    	hasChip: false,
 		    },
 		    additionalAttrs: [],
+		    isEditing: false,
 		};
 		this.handleChange = this.handleChange.bind(this);
 		this.handleCreatePostButtonClicked = this.handleCreatePostButtonClicked.bind(this);
@@ -25,6 +26,28 @@ export default class NewPostPage extends React.Component {
 		this.handleDeleteAttribute = this.handleDeleteAttribute.bind(this);
 		this.handleAttributeChange = this.handleAttributeChange.bind(this);
 		this.onSuggestSelect = this.onSuggestSelect.bind(this);
+	}
+
+	componentDidMount() {
+		if (!!this.props.location.state && !!this.props.location.state.post) {
+			const post = this.props.location.state.post;
+			const additionalAttrs = [ ...post.additional_attributes ];
+			delete post.additional_attributes;
+			post.hasChip = post.has_chip;
+			delete post.has_chip;
+			post.completedShots = post.completed_shots;
+			delete post.completed_shots;
+			post.isAggressive = post.is_aggressive;
+			delete post.is_aggressive;
+			delete post.submitter_user_id;
+			const datePicker = moment(post.last_seen);
+			this.setState({ 
+				post: post, 
+				additionalAttrs: additionalAttrs, 
+				datePicker: datePicker, 
+				isEditing: true,
+			});
+		}
 	}
 
 	handleChange(e) {
@@ -39,8 +62,8 @@ export default class NewPostPage extends React.Component {
 
 	handleDatePickerChange(date) {
 		const updatedPost = { ...this.state.post };
-		updatedPost.lastSeen = date;
-    	this.setState({ post: updatedPost });
+		updatedPost.last_seen = date.format('MM/DD/YYYY');
+    	this.setState({ post: updatedPost, datePicker: date });
   	}
 
 	handleCreatePostButtonClicked() {
@@ -90,15 +113,15 @@ export default class NewPostPage extends React.Component {
   	render() {
 	    return (
 	        <div>
-	        	<h1>New Post Page</h1>
+	        	<h1>{this.state.isEditing ? 'Edit Post' : 'New Post Page'}</h1>
 	        	<div>
 	        		{this.state.errorMessage.length > 0 ? <p>{this.state.errorMessage}</p> : ""}
 		        	<h6>Name: </h6> 
-		        	<input onChange={this.handleChange} type='text' name='name'/>
+		        	<input onChange={this.handleChange} type='text' name='name' value={this.state.post.name}/>
 		        	<h6>Last Seen: </h6>
-		        	<DatePicker selected={this.state.post.lastSeen} onChange={this.handleDatePickerChange}/>
+		        	<DatePicker selected={this.state.datePicker} onChange={this.handleDatePickerChange}/>
 		        	<h6>Reward: </h6>
-		        	<input onChange={this.handleChange} type='text' name='reward'/>
+		        	<input onChange={this.handleChange} type='text' name='reward' value={this.state.post.reward}/>
 		        	<div>
 		        		<h6>Location: </h6>
 				        <Geosuggest
@@ -110,19 +133,19 @@ export default class NewPostPage extends React.Component {
 				        />
 			      	</div>
 		        	<h6>Contact: </h6>
-		        	<input onChange={this.handleChange} type='text' name='contact'/>
+		        	<input onChange={this.handleChange} type='text' name='contact' value={this.state.post.contact}/>
 		        	<h6>Description: </h6>
-		        	<input onChange={this.handleChange} type='text' name='description'/>
+		        	<input onChange={this.handleChange} type='text' name='description' value={this.state.post.description}/>
 		        	<h6>Species: </h6>
-		        	<input onChange={this.handleChange} type='text' name='animal'/>
+		        	<input onChange={this.handleChange} type='text' name='animal' value={this.state.post.animal}/>
 		        	<h6>Breed: </h6>
-		        	<input onChange={this.handleChange} type='text' name='breed'/>
+		        	<input onChange={this.handleChange} type='text' name='breed' value={this.state.post.breed}/>
 		        	<h6>Aggressive: </h6>
-		        	<input onChange={this.handleChange} type='checkbox' name='isAggressive'/>
+		        	<input onChange={this.handleChange} type='checkbox' name='isAggressive' checked={this.state.post.isAggressive}/>
 		        	<h6>Completed Shots: </h6>
-		        	<input onChange={this.handleChange} type='checkbox' name='completedShots'/>
+		        	<input onChange={this.handleChange} type='checkbox' name='completedShots' checked={this.state.post.completedShots}/>
 		        	<h6>Chip: </h6>
-		        	<input onChange={this.handleChange} type='checkbox' name='hasChip'/>
+		        	<input onChange={this.handleChange} type='checkbox' name='hasChip' checked={this.state.post.hasChip}/>
 			        <ul>	
 			        	{this.state.additionalAttrs.map((attr, index) => 
 	                        <li key={index}>
@@ -134,7 +157,7 @@ export default class NewPostPage extends React.Component {
 	                </ul>
 		        	<button type="button" onClick={this.handleCreateNewAttributeClicked}>Add attribute</button>
 	        	</div>
-	        	<button type="button" onClick={this.handleCreatePostButtonClicked}>Create post</button>
+	        	<button type="button" onClick={this.handleCreatePostButtonClicked}>{this.state.isEditing ? 'Update' : 'Post'}</button>
 			</div>
 	    );
   	}

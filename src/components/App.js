@@ -16,6 +16,7 @@ export default class App extends React.Component {
 		        <Route exact path='/user/:username' component={UserHomePage} />
 		        <Route exact path='/signup' component={SignUpPage} />
 		        <Route exact path='/post/new' component={NewPostPage} />
+		        <Route exact path='/post/edit' component={NewPostPage} />
 		    </Switch>
 		);
 	}
