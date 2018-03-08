@@ -18,6 +18,7 @@ export default class NewPostPage extends React.Component {
 		    },
 		    additionalAttrs: [],
 		    isEditing: false,
+		    isEditingLocation: false,
 		};
 		this.handleChange = this.handleChange.bind(this);
 		this.handleCreatePostButtonClicked = this.handleCreatePostButtonClicked.bind(this);
@@ -25,7 +26,9 @@ export default class NewPostPage extends React.Component {
 		this.handleCreateNewAttributeClicked = this.handleCreateNewAttributeClicked.bind(this);
 		this.handleDeleteAttribute = this.handleDeleteAttribute.bind(this);
 		this.handleAttributeChange = this.handleAttributeChange.bind(this);
+		this.handleChangeLocationClicked = this.handleChangeLocationClicked.bind(this);
 		this.onSuggestSelect = this.onSuggestSelect.bind(this);
+		this.handleChangeLocationConfirmClicked = this.handleChangeLocationConfirmClicked.bind(this);
 	}
 
 	componentDidMount() {
@@ -46,6 +49,8 @@ export default class NewPostPage extends React.Component {
 				additionalAttrs: additionalAttrs, 
 				datePicker: datePicker, 
 				isEditing: true,
+				previousLat: post.latitude,
+		    	previousLng: post.longitude,
 			});
 		}
 	}
@@ -87,7 +92,7 @@ export default class NewPostPage extends React.Component {
 			const updatedPost = { ...this.state.post };
 			updatedPost.latitude = suggest.location.lat;
 			updatedPost.longitude = suggest.location.lng;
-		    this.setState({ post: updatedPost });
+		    this.setState({ post: updatedPost, pendingFormattedAddress: suggest.description });
 		}
 	}
 
@@ -110,7 +115,60 @@ export default class NewPostPage extends React.Component {
 		this.setState({ additionalAttrs: newAdditionalAttrs });
 	}
 
+	handleChangeLocationClicked(e) {
+		if (this.state.isEditingLocation) {
+			const post = { ...this.state.post }
+			post.latitude = this.state.previousLat;
+			post.longitude = this.state.previousLng;
+			this.setState({ post: post });
+		}
+		this.setState({ isEditingLocation: !this.state.isEditingLocation });
+	}
+
+	handleChangeLocationConfirmClicked(e) {
+		const post = { ...this.state.post };
+		post.formatted_address = this.state.pendingFormattedAddress;
+		this.setState({ 
+			previousLat: post.latitude, 
+			previousLng: post.longitude, 
+			isEditingLocation: false,
+			post: post,
+		});
+	}
+
   	render() {
+  		let locationField = '';
+  		if (!this.state.isEditing || this.state.isEditingLocation) {
+  			locationField = (
+		        <Geosuggest
+		            ref={el=>this._geoSuggest=el}
+		            placeholder="Location"
+		            onSuggestSelect={this.onSuggestSelect}
+		            location={new google.maps.LatLng(0, 0)}
+		            radius="20" 
+		        />
+  			);
+  		} else {
+  			locationField = (
+  				<h6>{this.state.post.formatted_address}</h6> 
+  			)
+  		}
+  		let editLocationButton = '';
+  		if (!this.state.isEditingLocation && this.state.isEditing) {
+  			editLocationButton = (
+				<button type="button" onClick={this.handleChangeLocationClicked}>Edit Location</button>
+  			);
+  		} else if (this.state.isEditingLocation && this.state.isEditing) {
+			editLocationButton = (
+				<button type="button" onClick={this.handleChangeLocationClicked}>Cancel</button>
+  			);
+  		}
+  		let confirmButton = '';
+  		if (this.state.isEditingLocation && this.state.isEditing) {
+  			confirmButton = (
+  				<button type="button" onClick={this.handleChangeLocationConfirmClicked}>Confirm</button>
+  			);
+  		}
 	    return (
 	        <div>
 	        	<h1>{this.state.isEditing ? 'Edit Post' : 'New Post Page'}</h1>
@@ -124,14 +182,10 @@ export default class NewPostPage extends React.Component {
 		        	<input onChange={this.handleChange} type='text' name='reward' value={this.state.post.reward}/>
 		        	<div>
 		        		<h6>Location: </h6>
-				        <Geosuggest
-				            ref={el=>this._geoSuggest=el}
-				            placeholder="Location"
-				            onSuggestSelect={this.onSuggestSelect}
-				            location={new google.maps.LatLng(0, 0)}
-				            radius="20" 
-				        />
-			      	</div>
+		        		{locationField}
+		        		{editLocationButton}
+		        		{confirmButton}
+		        	</div>
 		        	<h6>Contact: </h6>
 		        	<input onChange={this.handleChange} type='text' name='contact' value={this.state.post.contact}/>
 		        	<h6>Description: </h6>
