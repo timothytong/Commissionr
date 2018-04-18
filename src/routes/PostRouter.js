@@ -295,24 +295,10 @@ export default class PostRouter {
     editPost(req: $Request, res: $Response): void {
         const postId = req.params.id;
         const { body } = req;
-        const params : UpdatePostParams = {
-            name: body.name,
-            last_seen: body.lastSeen,
-            reward: body.reward,
-            longitude: body.longitude,
-            latitude: body.latitude,
-            contact: body.contact,
-            description: body.description,
-            animal: body.animal,
-            breed: body.breed,
-            isAggressive: body.isAggressive,
-            completedShots: body.completedShots,
-            hasChip: body.hasChip,
-        };
 
         let errorMsg : string = 'Unable to edit post.';
 
-        if (params.longitude < -180 || params.longitude > 180 || params.latitude < -90 || params.latitude > 90) {
+        if (body.longitude < -180 || body.longitude > 180 || body.latitude < -90 || body.latitude > 90) {
             return res.status(400).json({
                 message: 'Invalid longitude-latitude combination.',
             });
@@ -332,6 +318,7 @@ export default class PostRouter {
                 is_aggressive: body.isAggressive,
                 completed_shots: body.completedShots,
                 has_chip: body.hasChip,
+                formatted_address: body.formattedAddress,
             },{ 
                 where: {
                     id: postId,
@@ -340,7 +327,6 @@ export default class PostRouter {
                 returns: true,
             }).then((data) => {
                 if (data[0] > 0) { 
-                    delete req.session.key;
                     return res.status(200).json({
                         message: 'Successfully edited post.',
                     });

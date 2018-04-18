@@ -35,9 +35,13 @@ export default class NewPostPage extends React.Component {
 		if (!!this.props.location.state && !!this.props.location.state.post) {
 			const post = this.props.location.state.post;
 			const additionalAttrs = [ ...post.additional_attributes ];
+			const postId = post.id;
+			delete post.id;
 			delete post.additional_attributes;
 			post.hasChip = post.has_chip;
 			delete post.has_chip;
+			post.formattedAddress = post.formatted_address;
+			delete post.formatted_address;
 			post.completedShots = post.completed_shots;
 			delete post.completed_shots;
 			post.isAggressive = post.is_aggressive;
@@ -48,11 +52,13 @@ export default class NewPostPage extends React.Component {
 			const datePicker = moment(post.lastSeen);
 			this.setState({ 
 				post: post, 
+				postId: postId,
 				additionalAttrs: additionalAttrs, 
 				datePicker: datePicker, 
 				isEditing: true,
 				previousLat: post.latitude,
 		    	previousLng: post.longitude,
+		    	previousAddress: post.formattedAddress,
 			});
 		}
 	}
@@ -76,17 +82,31 @@ export default class NewPostPage extends React.Component {
 	handleCreatePostButtonClicked() {
 		const data = { ...this.state.post };
 		data.additionalAttributes = this.state.additionalAttrs;
-		axios.post('http://localhost:3000/api/v1/post/create/', data)
-        .then((response) => {
-            if (response.status === 200 || response.status === 201) {
-                console.log('Successfully created.');
-                this.props.history.push('/', { message: response.data.message });
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-            this.setState({ errorMessage: error.response.data.error.replace(/notNull Violation: /g,"")});
-        });
+		if (this.state.isEditing === true) {
+			axios.post('http://localhost:3000/api/v1/post/edit/' + this.state.postId, data)
+	        .then((response) => {
+	            if (response.status === 200 || response.status === 201) {
+	                console.log('Successfully edited.');
+	                this.props.history.push('/', { message: response.data.message });
+	            }
+	        })
+	        .catch((error) => {
+	            console.log(error);
+	            this.setState({ errorMessage: error.response.data.error.replace(/notNull Violation: /g,"")});
+	        });
+		} else {
+			axios.post('http://localhost:3000/api/v1/post/create/', data)
+	        .then((response) => {
+	            if (response.status === 200 || response.status === 201) {
+	                console.log('Successfully created.');
+	                this.props.history.push('/', { message: response.data.message });
+	            }
+	        })
+	        .catch((error) => {
+	            console.log(error);
+	            this.setState({ errorMessage: error.response.data.error.replace(/notNull Violation: /g,"")});
+	        });
+		}
 	}
 
 	onSuggestSelect(suggest) {
@@ -122,6 +142,7 @@ export default class NewPostPage extends React.Component {
 			const post = { ...this.state.post }
 			post.latitude = this.state.previousLat;
 			post.longitude = this.state.previousLng;
+			post.formattedAddress = this.state.previousAddress;
 			this.setState({ post: post });
 		}
 		this.setState({ isEditingLocation: !this.state.isEditingLocation });
@@ -129,10 +150,11 @@ export default class NewPostPage extends React.Component {
 
 	handleChangeLocationConfirmClicked(e) {
 		const post = { ...this.state.post };
-		post.formatted_address = this.state.pendingFormattedAddress;
+		post.formattedAddress = this.state.pendingFormattedAddress;
 		this.setState({ 
 			previousLat: post.latitude, 
 			previousLng: post.longitude, 
+			previousAddress: post.formattedAddress,
 			isEditingLocation: false,
 			post: post,
 		});
@@ -152,7 +174,7 @@ export default class NewPostPage extends React.Component {
   			);
   		} else {
   			locationField = (
-  				<h6>{this.state.post.formatted_address}</h6> 
+  				<h6>{this.state.post.formattedAddress}</h6> 
   			)
   		}
   		let editLocationButton = '';
