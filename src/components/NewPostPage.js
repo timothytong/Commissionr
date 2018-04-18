@@ -43,7 +43,9 @@ export default class NewPostPage extends React.Component {
 			post.isAggressive = post.is_aggressive;
 			delete post.is_aggressive;
 			delete post.submitter_user_id;
-			const datePicker = moment(post.last_seen);
+			post.lastSeen = post.last_seen;
+			delete post.last_seen;
+			const datePicker = moment(post.lastSeen);
 			this.setState({ 
 				post: post, 
 				additionalAttrs: additionalAttrs, 
@@ -67,7 +69,7 @@ export default class NewPostPage extends React.Component {
 
 	handleDatePickerChange(date) {
 		const updatedPost = { ...this.state.post };
-		updatedPost.last_seen = date.format('MM/DD/YYYY');
+		updatedPost.lastSeen = date.format('MM/DD/YYYY');
     	this.setState({ post: updatedPost, datePicker: date });
   	}
 
