@@ -17,7 +17,7 @@ export default class UserHomePage extends React.Component {
         .then((response) => {
             this.setState({loading: false});
             if (response.status === 200 || response.status === 304) {
-                this.setState({authenticated: true});
+                this.setState({authenticated: true, loggedInUsername: response.data.user_name});
             }
         })
         .catch((error) => {
@@ -31,7 +31,8 @@ export default class UserHomePage extends React.Component {
             return (
                 <div>
                     <Navbar history={this.props.history} authenticated={this.state.authenticated}/>
-                    <PostsList username={this.props.match.params.username}/>
+                    <PostsList 
+                    username={this.props.match.params.username} postsEditable={this.props.match.params.username === this.state.loggedInUsername}/>
                     <NewPostButton history={this.props.history}/>
                 </div>
             );

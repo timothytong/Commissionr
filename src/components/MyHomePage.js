@@ -31,7 +31,7 @@ export default class MyHomePage extends React.Component {
             return (
                 <div>
                 	<Navbar history={this.props.history} authenticated={this.state.authenticated}/>
-                    <PostsList />
+                    <PostsList postsEditable={true}/>
                     <NewPostButton history={this.props.history}/> 
                 </div>
             );

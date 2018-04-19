@@ -54,6 +54,7 @@ export default class UserRouter {
             console.log(req.session.key['id']);
             return res.status(200).json({
                 message: 'User is logged in',
+                user_name: req.session.key.user_name,
             });
         } else {
             return res.status(401).json({

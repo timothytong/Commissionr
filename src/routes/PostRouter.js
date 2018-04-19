@@ -102,7 +102,6 @@ export default class PostRouter {
             where: {
                 user_name: username,
                 active: true,
-                deleted: false,
             }
         }).then((user) => {
              if (!!user) {
@@ -110,6 +109,7 @@ export default class PostRouter {
                 PostModels.postDb.findAll({
                     where: {
                         submitter_user_id: user.id,
+                        deleted: false,
                     },
                     include: [
                         {

@@ -25,7 +25,7 @@ export default class PostsList extends React.Component {
             console.log(response);
         })
         .catch((error) => {
-            this.setState({loading: false});
+            this.setState({loading: false, errorMessage: error.response.data.message});
             console.log(error);
         });
     }
@@ -47,16 +47,24 @@ export default class PostsList extends React.Component {
                 <ul>
                     {
                         this.state.posts.map((post, index) => {
-                            return (
-                                <li key={index}>
-                                    {post.id}: looking for {post.name} around {post.formatted_address}
+                            let deleteButton = null;
+                            let editButton = null;
+                            if (this.props.postsEditable === true) {
+                                deleteButton = <DeleteButton deletePost={this.deletePost} postId={post.id} postIndex={index}/>;
+                                editButton = (
                                     <Link to={{
                                         pathname: '/post/edit',
                                         state: { post: post }
                                     }}>
                                         Edit
                                     </Link>
-                                    <DeleteButton deletePost={this.deletePost} postId={post.id} postIndex={index}/>
+                                );
+                            }
+                            return (
+                                <li key={index}>
+                                    {post.id}: looking for {post.name} around {post.formatted_address}
+                                    {editButton}
+                                    {deleteButton}
                                     <ul>
                                         {post.additional_attributes.map((attr, index) =>
                                             <li key={index}>
@@ -73,7 +81,7 @@ export default class PostsList extends React.Component {
         } else {
             return (
                 <div>
-                    <h1>Error loading content.</h1>
+                    <h1>{this.state.errorMessage || "Error loading content"}</h1>
                 </div>
             );
         }
