@@ -32,7 +32,9 @@ export default class UserHomePage extends React.Component {
                 <div>
                     <Navbar history={this.props.history} authenticated={this.state.authenticated}/>
                     <PostsList 
-                    username={this.props.match.params.username} postsEditable={this.props.match.params.username === this.state.loggedInUsername}/>
+                        username={this.props.match.params.username} 
+                        postsEditable={this.props.match.params.username === this.state.loggedInUsername}
+                    />
                     <NewPostButton history={this.props.history}/>
                 </div>
             );

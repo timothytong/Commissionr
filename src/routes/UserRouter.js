@@ -43,8 +43,9 @@ export default class UserRouter {
         this.router.post('/create', this.createUser);
         this.router.post('/validate', this.validateUser);
         this.router.post('/login', this.loginUser);
-        this.router.post('/delete', this.deleteUser)
+        this.router.post('/delete', this.deleteUser);
         this.router.post('/changePassword', this.changePassword);
+        this.router.post('/updateProfile', this.updateProfile);
         this.router.get('/logout', this.logout);
         this.router.get('/session', this.getSession);
     }
@@ -96,6 +97,68 @@ export default class UserRouter {
                 error: err.message,
             });
         });
+    }
+
+    updateUser(editInfo) {
+        UserModels.userDb.update(editInfo, {
+            where: {
+                id: userId,
+            },
+            returns: true,
+        }).then((data) => {
+            if (data[0] > 0) {
+                return res.status(200).json({
+                    message: 'Successfully updated profile.',
+                });
+            } else {
+                return res.status(500).json({
+                    message: errorMsg,
+                    error: err.message,
+                });
+            }
+        }).catch((err) => {
+            logger.error(errorMsg, err, err.message);
+            return res.status(500).json({
+                message: errorMsg,
+                error: err.message,
+            });
+        });
+    }
+
+    updateProfile(req: $Request, res: $Response): void {
+        const { body } = req;
+        const userId : string = req.session.key['id'];
+        const email : string = body.email;
+        const username : string = body.username;
+        let errorMsg : string = 'Invalid username or email.';
+
+        const editInfo = {};
+
+        if (!!body.email) {
+            editInfo.email = email;
+        } 
+        if (!!body.username) {
+            return checkUserNameExists(username).then((data) => {
+                if (!!data) {
+                    return res.status(400).json({
+                        message: 'Username unavailable.',
+                        error: err.message,
+                    });
+                } else {
+                    editInfo.username = username;
+                    return this.updateUser(editInfo);
+                }
+            }).catch((err) => {
+                logger.error(errorMsg, err, err.message);
+                return res.status(400).json({
+                    message: errorMsg,
+                    error: err.message,
+                });
+            });
+        }
+
+        return this.updateUser(editInfo);
+
     }
 
     loginUser(req: $Request, res: $Response): void {
@@ -255,7 +318,7 @@ export default class UserRouter {
 
 }
 
-function checkUserNameExists (username : string) {
+function checkUserNameExists (username) {
     return UserModels.userDb.findOne({
         where: {
             user_name: username,
