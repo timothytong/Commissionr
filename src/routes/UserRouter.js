@@ -32,10 +32,9 @@ export default class UserRouter {
         this.router = Router();
         this.path = path;
         // glue it all together
+        this.updateProfile = this.updateProfile.bind(this);
         this.init();
     }
-
-
     /**
     * Attach route handlers to their endpoints.
     */
@@ -99,7 +98,7 @@ export default class UserRouter {
         });
     }
 
-    updateUser(editInfo) {
+    updateUser(editInfo, userId, successHandler, errorHandler) {
         UserModels.userDb.update(editInfo, {
             where: {
                 id: userId,
@@ -107,21 +106,12 @@ export default class UserRouter {
             returns: true,
         }).then((data) => {
             if (data[0] > 0) {
-                return res.status(200).json({
-                    message: 'Successfully updated profile.',
-                });
+                successHandler();
             } else {
-                return res.status(500).json({
-                    message: errorMsg,
-                    error: err.message,
-                });
+                errorHandler({});
             }
         }).catch((err) => {
-            logger.error(errorMsg, err, err.message);
-            return res.status(500).json({
-                message: errorMsg,
-                error: err.message,
-            });
+            errorHandler(err);
         });
     }
 
@@ -131,13 +121,29 @@ export default class UserRouter {
         const email : string = body.email;
         const username : string = body.username;
         let errorMsg : string = 'Invalid username or email.';
-
+        const onSuccessHandler = () => {
+            return res.status(200).json({
+                message: 'Successfully updated profile.',
+            });
+        }
+        const onErrorHandler = (err) => {
+            return res.status(500).json({
+                message: errorMsg,
+                error: err.message,
+            });
+        }
         const editInfo = {};
 
-        if (!!body.email) {
+        if (!!email) {
+            if (!isEmailAddressValid(email)) {
+                return res.status(400).json({
+                    message: 'Invalid email.',
+                }); 
+            }
             editInfo.email = email;
         } 
-        if (!!body.username) {
+
+        if (!!username) {
             return checkUserNameExists(username).then((data) => {
                 if (!!data) {
                     return res.status(400).json({
@@ -145,8 +151,8 @@ export default class UserRouter {
                         error: err.message,
                     });
                 } else {
-                    editInfo.username = username;
-                    return this.updateUser(editInfo);
+                    editInfo.user_name = username;
+                    return this.updateUser(editInfo, userId, onSuccessHandler, onErrorHandler);
                 }
             }).catch((err) => {
                 logger.error(errorMsg, err, err.message);
@@ -157,7 +163,7 @@ export default class UserRouter {
             });
         }
 
-        return this.updateUser(editInfo);
+        return this.updateUser(editInfo, userId, onSuccessHandler, onErrorHandler);
 
     }
 
@@ -325,4 +331,12 @@ function checkUserNameExists (username) {
             active: true,
         }
     });
+}
+
+function isEmailAddressValid (email) {
+    const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+    if (!email.match(emailRegex)) {
+        return false;
+    }
+    return true;
 }
