@@ -55,6 +55,7 @@ export default class UserRouter {
             return res.status(200).json({
                 message: 'User is logged in',
                 user_name: req.session.key.user_name,
+                email: req.session.key.email,
             });
         } else {
             return res.status(401).json({
@@ -103,10 +104,12 @@ export default class UserRouter {
             where: {
                 id: userId,
             },
-            returns: true,
+            returning: true,
+            plain: true,
         }).then((data) => {
-            if (data[0] > 0) {
-                successHandler();
+            console.log(data[1].dataValues);
+            if (!!data[1].dataValues) {
+                successHandler(data[1].dataValues);
             } else {
                 errorHandler({});
             }
@@ -121,7 +124,8 @@ export default class UserRouter {
         const email : string = body.email;
         const username : string = body.username;
         let errorMsg : string = 'Invalid username or email.';
-        const onSuccessHandler = () => {
+        const onSuccessHandler = (data) => {
+            req.session.key = data;
             return res.status(200).json({
                 message: 'Successfully updated profile.',
             });
