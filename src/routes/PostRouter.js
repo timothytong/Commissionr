@@ -18,11 +18,6 @@ type CreatePostParams = {
     latitude: double,
     contact: string,
     description: string,
-    animal: string,
-    breed: string,
-    isAggressive: boolean,
-    completedShots: boolean,
-    hasChip: boolean,
     formattedAddress: string,
     submitterUserId: number,
 };
@@ -60,6 +55,7 @@ export default class PostRouter {
         this.router.get('/userposts/:username', this.getUserPosts);
         this.router.get('/logged-in-userposts', this.getLoggedInUserPosts);
         this.router.get('/get/:id', this.getPost);
+        this.router.post('/found/:id', this.markAsFound);
     }
 
     getPost(req: $Request, res: $Response): void {
@@ -230,11 +226,6 @@ export default class PostRouter {
             latitude: body.latitude,
             contact: body.contact,
             description: body.description,
-            animal: body.animal,
-            breed: body.breed,
-            isAggressive: body.isAggressive,
-            completedShots: body.completedShots,
-            hasChip: body.hasChip,
             submitterUserId: req.session.key['id'],
         };
         if (params.longitude < -180 || params.longitude > 180 || params.latitude < -90 || params.latitude > 90) {
@@ -253,11 +244,6 @@ export default class PostRouter {
                     latitude: post.latitude,
                     contact: post.contact,
                     description: post.description,
-                    animal: post.animal,
-                    breed: post.breed,
-                    is_aggressive: post.isAggressive,
-                    completed_shots: post.completedShots,
-                    has_chip: post.hasChip,
                     formatted_address: post.formattedAddress,
                     submitter_user_id: post.submitterUserId,
                 }).then((data) => {
@@ -313,11 +299,6 @@ export default class PostRouter {
                 latitude: body.latitude,
                 contact: body.contact,
                 description: body.description,
-                animal: body.animal,
-                breed: body.breed,
-                is_aggressive: body.isAggressive,
-                completed_shots: body.completedShots,
-                has_chip: body.hasChip,
                 formatted_address: body.formattedAddress,
             },{ 
                 where: {
@@ -348,6 +329,58 @@ export default class PostRouter {
             })
         }
 
+    }
+
+    markAsFound(req: $Request, res: $Response): void {
+        const postId = req.params.id;
+        const { body } = req;
+        const username = body.username;
+
+        if (!!req.session.key) {
+            UserModels.userDb.findOne({
+                where: {
+                    user_name: username,
+                    active: true,
+                },
+            }).then((data) => {
+                let foundUserId = null;
+                if (!!data) {
+                    foundUserId = data.dataValues.id;
+                }
+                PostModels.postDb.update({
+                    found: true,
+                    found_user_id: foundUserId,
+                },{ 
+                    where: {
+                        id: postId,
+                        submitter_user_id: req.session.key['id'],
+                        found: false,
+                    },
+                    returning: true,
+                    plain: true,
+                }).then((data) => {
+                    console.log(data);
+                    if (!!data && !!data[1].dataValues) { 
+                        return res.status(200).json({
+                            message: 'Successfully marked as found.',
+                        });
+                    } else {
+                        return res.status(500).json({
+                            message: 'Internal server error.'
+                        });
+                    }
+                }).catch((err) => {
+                    return res.status(400).json({
+                        message: 'User not authorized.',
+                        error: err.message,
+                    });
+                });
+            });
+        } else {
+            return res.status(401).json({
+                message: 'User not authenticated.'
+            });
+        }
     }
 
 }

@@ -11,12 +11,8 @@ export default class NewPostPage extends React.Component {
 		super(props);
 		this.state = {
 		    errorMessage: '',
-		    post: {
-		    	isAggressive: false,
-		    	completedShots: false,
-		    	hasChip: false,
-		    },
 		    additionalAttrs: [],
+		    post: {},
 		    isEditing: false,
 		    isEditingLocation: false,
 		};
@@ -38,14 +34,8 @@ export default class NewPostPage extends React.Component {
 			const postId = post.id;
 			delete post.id;
 			delete post.additional_attributes;
-			post.hasChip = post.has_chip;
-			delete post.has_chip;
 			post.formattedAddress = post.formatted_address;
 			delete post.formatted_address;
-			post.completedShots = post.completed_shots;
-			delete post.completed_shots;
-			post.isAggressive = post.is_aggressive;
-			delete post.is_aggressive;
 			delete post.submitter_user_id;
 			post.lastSeen = post.last_seen;
 			delete post.last_seen;
@@ -214,16 +204,6 @@ export default class NewPostPage extends React.Component {
 		        	<input onChange={this.handleChange} type='text' name='contact' value={this.state.post.contact}/>
 		        	<h6>Description: </h6>
 		        	<input onChange={this.handleChange} type='text' name='description' value={this.state.post.description}/>
-		        	<h6>Species: </h6>
-		        	<input onChange={this.handleChange} type='text' name='animal' value={this.state.post.animal}/>
-		        	<h6>Breed: </h6>
-		        	<input onChange={this.handleChange} type='text' name='breed' value={this.state.post.breed}/>
-		        	<h6>Aggressive: </h6>
-		        	<input onChange={this.handleChange} type='checkbox' name='isAggressive' checked={this.state.post.isAggressive}/>
-		        	<h6>Completed Shots: </h6>
-		        	<input onChange={this.handleChange} type='checkbox' name='completedShots' checked={this.state.post.completedShots}/>
-		        	<h6>Chip: </h6>
-		        	<input onChange={this.handleChange} type='checkbox' name='hasChip' checked={this.state.post.hasChip}/>
 			        <ul>	
 			        	{this.state.additionalAttrs.map((attr, index) => 
 	                        <li key={index}>

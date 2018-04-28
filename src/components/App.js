@@ -5,6 +5,7 @@ import UserHomePage from './UserHomePage';
 import SignUpPage from './SignUpPage';
 import NewPostPage from './NewPostPage';
 import EditProfilePage from './EditProfilePage';
+import FoundPage from './FoundPage';
 import React from 'react';
 import axios from 'axios';
 
@@ -19,6 +20,7 @@ export default class App extends React.Component {
 		        <Route exact path='/signup' component={SignUpPage} />
 		        <Route exact path='/post/new' component={NewPostPage} />
 		        <Route exact path='/post/edit' component={NewPostPage} />
+		        <Route exact path='/post/found' component={FoundPage} />
 		    </Switch>
 		);
 	}

@@ -33,33 +33,24 @@ const PostDb = Database.define(POSTS_TABLE, {
         type: DataTypes.DOUBLE,
         allowNull: false,
     },
+    city: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    state: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    country: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     contact: {
         type: DataTypes.STRING,
         allowNull: false,
     },
     description: {
         type: DataTypes.STRING,
-        allowNull: false,
-    },
-    animal: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: true,
-    },
-    breed: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    is_aggressive: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-    },
-    completed_shots: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-    },
-    has_chip: {
-        type: DataTypes.BOOLEAN,
         allowNull: false,
     },
     found: {

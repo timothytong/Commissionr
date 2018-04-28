@@ -107,7 +107,6 @@ export default class UserRouter {
             returning: true,
             plain: true,
         }).then((data) => {
-            console.log(data[1].dataValues);
             if (!!data[1].dataValues) {
                 successHandler(data[1].dataValues);
             } else {
