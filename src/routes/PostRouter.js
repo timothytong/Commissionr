@@ -106,6 +106,7 @@ export default class PostRouter {
                     where: {
                         submitter_user_id: user.id,
                         deleted: false,
+                        found: false,
                     },
                     include: [
                         {
@@ -142,6 +143,7 @@ export default class PostRouter {
                 where: {
                     submitter_user_id: req.session.key['id'],
                     deleted: false,
+                    found: false,
                 },
                 include: [
                     {
@@ -346,6 +348,10 @@ export default class PostRouter {
                 let foundUserId = null;
                 if (!!data) {
                     foundUserId = data.dataValues.id;
+                } else {
+                    return res.status(404).json({
+                        message: 'Username not found.',
+                    });
                 }
                 PostModels.postDb.update({
                     found: true,
