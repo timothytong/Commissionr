@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import {DOMAIN_URL} from '../utils/Constants';
 
 import { Link } from 'react-router-dom';
 
@@ -30,7 +31,7 @@ export default class FoundPage extends React.Component {
 
     handleSubmitButtonClicked() {
         const data = {username: this.state.username};
-        axios.post('http://localhost:3000/api/v1/post/found/' + this.state.postId, data)
+        axios.post(`${DOMAIN_URL}/api/v1/post/found/${this.state.postId}`, data)
             .then((response) => {
                 if (response.status === 200) {
                     this.props.history.push('/', { message: response.data.message });

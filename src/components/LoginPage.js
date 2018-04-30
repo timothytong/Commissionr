@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import {DOMAIN_URL} from '../utils/Constants';
 
 export default class LoginPage extends React.Component {
 	constructor(props) {
@@ -15,7 +16,8 @@ export default class LoginPage extends React.Component {
 	}
 
 	componentDidMount() {
-		axios.get('http://localhost:3000/api/v1/user/session')
+        console.log("Login - Base url is " + DOMAIN_URL);
+		axios.get(`${DOMAIN_URL}/api/v1/user/session`)
         .then((response) => {
             if (response.status === 200) {
             	this.props.history.push('/home');
@@ -31,7 +33,7 @@ export default class LoginPage extends React.Component {
 	}
 
 	handleLoginButtonClicked() {
-		axios.post('http://localhost:3000/api/v1/user/login', {
+		axios.post(`${DOMAIN_URL}/api/v1/user/login`, {
 			username: this.state.username,
 			password: this.state.password,
 		})
@@ -53,7 +55,7 @@ export default class LoginPage extends React.Component {
 
   	render() {
   		let errorMessage = '';
-  		
+
   		if (this.state.errorMessage.length > 0) {
   			errorMessage = <p>{this.state.errorMessage}</p>;
   		} else if (!!this.props.location.state) {

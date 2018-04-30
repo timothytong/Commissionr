@@ -4,14 +4,19 @@
 
 import Sequelize from 'sequelize';
 
+console.log("Process env is " + process.env.NODE_ENV);
+
+const match = process.env.NODE_ENV === 'production' ? process.env.DATABASE_URL.match(/postgres:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/) : '';
+
 const Database = (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') ?
     new Sequelize(
-        process.env.RDS_DB_NAME,
-        process.env.RDS_USERNAME,
-        process.env.RDS_PASSWORD, {
-            host: process.env.RDS_HOSTNAME,
-            port: process.env.PGPORT,
+        match[5],
+        match[1],
+        match[2], {
+            host: match[3],
+            port: match[4],
             dialect: 'postgres',
+            protocol: 'postgres',
             pool: {
                 max: 10,
                 min: 0,

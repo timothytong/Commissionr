@@ -31,14 +31,17 @@ export default class Api {
     // register middlewares
     middleware(): void {
         const store = redisStore(session);
+        const redisStoreOptions = process.env.NODE_ENV === 'production' ?
+            new store({url: process.env.REDIS_URL})
+            : new store({
+                host: process.env.REDIS_HOST,
+                port: process.env.REDIS_PORT,
+            })
         this.express.use(morgan('dev'));
         this.express.use(session({
             secret: 'abc',
             resave: false,
-            store: new store({
-                host: process.env.REDIS_HOST,
-                port: process.env.REDIS_PORT,
-            }),
+            store: redisStoreOptions,
             saveUninitialized: false,
             cookie: {
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 24h * 7 in milliseconds

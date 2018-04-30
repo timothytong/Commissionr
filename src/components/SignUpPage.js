@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import {DOMAIN_URL} from '../utils/Constants';
 
 export default class SignUpPage extends React.Component {
 	constructor(props) {
@@ -31,7 +32,7 @@ export default class SignUpPage extends React.Component {
 		} else if (this.state.password.length < 6) {
 			this.setState({errorMessage: 'Passwords must be at least six characters.'});
 		} else {
-			axios.post('http://localhost:3000/api/v1/user/create', {
+			axios.post(`${DOMAIN_URL}/api/v1/user/create`, {
 				email: this.state.email,
 				username: this.state.username,
 				password: this.state.password,

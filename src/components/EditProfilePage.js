@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import Navbar from './Navbar';
+import {DOMAIN_URL} from '../utils/Constants';
 
 export default class EditProfilePage extends React.Component {
     constructor(props) {
@@ -14,7 +15,7 @@ export default class EditProfilePage extends React.Component {
     }
 
     componentDidMount() {
-        axios.get('http://localhost:3000/api/v1/user/session')
+        axios.get(`${DOMAIN_URL}/api/v1/user/session`)
         .then((response) => {
             if (response.status === 200 || response.status === 304) {
                 this.setState({retrievedUsername: response.data.user_name, username: response.data.user_name, email: response.data.email});
@@ -31,7 +32,7 @@ export default class EditProfilePage extends React.Component {
         if (this.state.retrievedUsername === this.state.username) {
             delete data.username;
         }
-        axios.post('http://localhost:3000/api/v1/user/updateProfile', data)
+        axios.post(`${DOMAIN_URL}/api/v1/user/updateProfile`, data)
         .then((response) => {
             if (response.status === 200 || response.status === 201) {
                 console.log('Successfully edited.');
@@ -58,6 +59,6 @@ export default class EditProfilePage extends React.Component {
                 <input onChange={this.handleChange} type="text" name="email" value={this.state.email}/>
                 <button type="button" onClick={this.handleUpdateButtonClicked}>Update</button>
             </div>
-        )   
+        )
     }
 }

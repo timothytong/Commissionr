@@ -4,6 +4,7 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
 import Geosuggest from 'react-geosuggest';
+import {DOMAIN_URL} from '../utils/Constants';
 
 export default class NewPostPage extends React.Component {
 
@@ -40,11 +41,11 @@ export default class NewPostPage extends React.Component {
 			post.lastSeen = post.last_seen;
 			delete post.last_seen;
 			const datePicker = moment(post.lastSeen);
-			this.setState({ 
-				post: post, 
+			this.setState({
+				post: post,
 				postId: postId,
-				additionalAttrs: additionalAttrs, 
-				datePicker: datePicker, 
+				additionalAttrs: additionalAttrs,
+				datePicker: datePicker,
 				isEditing: true,
 				previousLat: post.latitude,
 		    	previousLng: post.longitude,
@@ -73,7 +74,7 @@ export default class NewPostPage extends React.Component {
 		const data = { ...this.state.post };
 		data.additionalAttributes = this.state.additionalAttrs;
 		if (this.state.isEditing === true) {
-			axios.post('http://localhost:3000/api/v1/post/edit/' + this.state.postId, data)
+			axios.post(`${DOMAIN_URL}/api/v1/post/edit/${this.state.postId}`, data)
 	        .then((response) => {
 	            if (response.status === 200 || response.status === 201) {
 	                console.log('Successfully edited.');
@@ -85,7 +86,7 @@ export default class NewPostPage extends React.Component {
 	            this.setState({ errorMessage: error.response.data.error.replace(/notNull Violation: /g,"")});
 	        });
 		} else {
-			axios.post('http://localhost:3000/api/v1/post/create/', data)
+			axios.post(`${DOMAIN_URL}/api/v1/post/create/`, data)
 	        .then((response) => {
 	            if (response.status === 200 || response.status === 201) {
 	                console.log('Successfully created.');
@@ -141,9 +142,9 @@ export default class NewPostPage extends React.Component {
 	handleChangeLocationConfirmClicked(e) {
 		const post = { ...this.state.post };
 		post.formattedAddress = this.state.pendingFormattedAddress;
-		this.setState({ 
-			previousLat: post.latitude, 
-			previousLng: post.longitude, 
+		this.setState({
+			previousLat: post.latitude,
+			previousLng: post.longitude,
 			previousAddress: post.formattedAddress,
 			isEditingLocation: false,
 			post: post,
@@ -159,12 +160,12 @@ export default class NewPostPage extends React.Component {
 		            placeholder="Location"
 		            onSuggestSelect={this.onSuggestSelect}
 		            location={new google.maps.LatLng(0, 0)}
-		            radius="20" 
+		            radius="20"
 		        />
   			);
   		} else {
   			locationField = (
-  				<h6>{this.state.post.formattedAddress}</h6> 
+  				<h6>{this.state.post.formattedAddress}</h6>
   			)
   		}
   		let editLocationButton = '';
@@ -188,7 +189,7 @@ export default class NewPostPage extends React.Component {
 	        	<h1>{this.state.isEditing ? 'Edit Post' : 'New Post Page'}</h1>
 	        	<div>
 	        		{this.state.errorMessage.length > 0 ? <p>{this.state.errorMessage}</p> : ""}
-		        	<h6>Name: </h6> 
+		        	<h6>Name: </h6>
 		        	<input onChange={this.handleChange} type='text' name='name' value={this.state.post.name}/>
 		        	<h6>Last Seen: </h6>
 		        	<DatePicker selected={this.state.datePicker} onChange={this.handleDatePickerChange}/>
@@ -204,8 +205,8 @@ export default class NewPostPage extends React.Component {
 		        	<input onChange={this.handleChange} type='text' name='contact' value={this.state.post.contact}/>
 		        	<h6>Description: </h6>
 		        	<input onChange={this.handleChange} type='text' name='description' value={this.state.post.description}/>
-			        <ul>	
-			        	{this.state.additionalAttrs.map((attr, index) => 
+			        <ul>
+			        	{this.state.additionalAttrs.map((attr, index) =>
 	                        <li key={index}>
 				        		<input value={attr.key} name={index + '|key'} onChange={this.handleAttributeChange} type='text'/>
 				        		<input value={attr.value} name={index + '|value'} onChange={this.handleAttributeChange} type='text'/>
@@ -219,6 +220,6 @@ export default class NewPostPage extends React.Component {
 			</div>
 	    );
   	}
-  	
+
 }
 

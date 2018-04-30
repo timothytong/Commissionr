@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import {DOMAIN_URL} from '../utils/Constants';
 
 export default class Navbar extends React.Component {
     constructor(props) {
@@ -11,7 +12,7 @@ export default class Navbar extends React.Component {
 
 
     handleLogoutButtonClicked(e) {
-        axios.get('http://localhost:3000/api/v1/user/logout')
+        axios.get(`${DOMAIN_URL}/api/v1/user/logout`)
         .then((response) => {
             console.log(response);
             this.props.history.push('/');

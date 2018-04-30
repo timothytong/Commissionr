@@ -3,6 +3,7 @@ import axios from 'axios';
 import Navbar from './Navbar';
 import PostsList from './PostsList';
 import NewPostButton from './NewPostButton';
+import {DOMAIN_URL} from '../utils/Constants';
 
 export default class MyHomePage extends React.Component {
     constructor(props) {
@@ -13,7 +14,7 @@ export default class MyHomePage extends React.Component {
     }
 
     componentDidMount() {
-        axios.get('http://localhost:3000/api/v1/user/session')
+        axios.get(`${DOMAIN_URL}/api/v1/user/session`)
         .then((response) => {
         	this.setState({loading: false});
             if (response.status === 200 || response.status === 304) {
@@ -32,7 +33,7 @@ export default class MyHomePage extends React.Component {
                 <div>
                 	<Navbar history={this.props.history} authenticated={this.state.authenticated}/>
                     <PostsList postsEditable={true}/>
-                    <NewPostButton history={this.props.history}/> 
+                    <NewPostButton history={this.props.history}/>
                 </div>
             );
         } else if (!this.state.authenticated) {

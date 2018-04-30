@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import DeleteButton from './DeleteButton';
 import { Link } from 'react-router-dom';
+import {DOMAIN_URL} from '../utils/Constants';
 
 export default class PostsList extends React.Component {
 
@@ -14,9 +15,9 @@ export default class PostsList extends React.Component {
     }
 
     componentDidMount() {
-        let url = 'http://localhost:3000/api/v1/post/logged-in-userposts/';
+        let url = `${DOMAIN_URL}/api/v1/post/logged-in-userposts/`;
         if (!!this.props.username) {
-            url = 'http://localhost:3000/api/v1/post/userposts/' + this.props.username;
+            url = `${DOMAIN_URL}/api/v1/post/userposts/${this.props.username}`;
         }
         axios.get(url)
         .then((response) => {

@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import {DOMAIN_URL} from '../utils/Constants';
 
 export default class DeleteButton extends React.Component {
     constructor(props) {
@@ -8,7 +9,7 @@ export default class DeleteButton extends React.Component {
     }
 
     handleDeleteButtonClicked() {
-        axios.delete('http://localhost:3000/api/v1/post/delete/' + this.props.postId)
+        axios.delete(`${DOMAIN_URL}/api/v1/post/delete/${this.props.postId}`)
         .then((response) => {
             if (response.status === 200 || response.status === 202) {
                 this.props.deletePost(this.props.postIndex);
@@ -27,5 +28,5 @@ export default class DeleteButton extends React.Component {
             </div>
         );
     }
-    
+
 }
