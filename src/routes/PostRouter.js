@@ -169,19 +169,19 @@ export default class PostRouter {
 
     deletePost(req: $Request, res: $Response): void {
         const postId = req.params.id;
-        let errorMsg : string = 'Unable to delete post.';    
-        
+        let errorMsg : string = 'Unable to delete post.';
+
         if (!!req.session.key) {
             PostModels.postDb.update({
                 deleted: true,
-            },{ 
+            },{
                 where: {
                     id: postId,
                     submitter_user_id: req.session.key['id'],
                 },
                 returns: true,
             }).then((data) => {
-                if (data[0] > 0) { 
+                if (data[0] > 0) {
                     return res.status(202).json({
                         message: 'Successfully deleted post.',
                     });
@@ -208,8 +208,29 @@ export default class PostRouter {
         return this.googleClient.reverseGeocode({
             latlng: [post.latitude, post.longitude],
         }, (error, data) => {
+            post.city = 'Unknown';
+            post.state = 'Unknown';
+            post.country = 'Unknown';
+
             if (error === null && data.json.results.length !== 0) {
-                post.formattedAddress = data.json.results[0].formatted_address;
+                const formattedAddress = data.json.results[0].formatted_address;
+
+                post.formattedAddress = formattedAddress;
+
+                const components = formattedAddress.split(',');
+                const trimmedComponents = components.map((component) => component.trim());
+                const length = trimmedComponents.length;
+
+                if (length > 0) {
+                    post.country = trimmedComponents[length - 1];
+                }
+                if (length > 1) {
+                    post.state = trimmedComponents[length - 2];
+                }
+                if (length > 2) {
+                    post.city = trimmedComponents[length - 3];
+                }
+
             } else {
                 const rawData = `Latitude (${post.latitude}), Longitude (${post.longitude})`;
                 post.formattedAddress = rawData;
@@ -245,6 +266,9 @@ export default class PostRouter {
                     longitude: post.longitude,
                     latitude: post.latitude,
                     contact: post.contact,
+                    city: post.city,
+                    state: post.state,
+                    country: post.country,
                     description: post.description,
                     formatted_address: post.formattedAddress,
                     submitter_user_id: post.submitterUserId,
@@ -302,14 +326,14 @@ export default class PostRouter {
                 contact: body.contact,
                 description: body.description,
                 formatted_address: body.formattedAddress,
-            },{ 
+            },{
                 where: {
                     id: postId,
                     submitter_user_id: req.session.key['id'],
                 },
                 returns: true,
             }).then((data) => {
-                if (data[0] > 0) { 
+                if (data[0] > 0) {
                     return res.status(200).json({
                         message: 'Successfully edited post.',
                     });
@@ -356,7 +380,7 @@ export default class PostRouter {
                 PostModels.postDb.update({
                     found: true,
                     found_user_id: foundUserId,
-                },{ 
+                },{
                     where: {
                         id: postId,
                         submitter_user_id: req.session.key['id'],
@@ -366,7 +390,7 @@ export default class PostRouter {
                     plain: true,
                 }).then((data) => {
                     console.log(data);
-                    if (!!data && !!data[1].dataValues) { 
+                    if (!!data && !!data[1].dataValues) {
                         return res.status(200).json({
                             message: 'Successfully marked as found.',
                         });

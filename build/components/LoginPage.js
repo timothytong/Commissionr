@@ -50,7 +50,6 @@ var LoginPage = function (_React$Component) {
 		value: function componentDidMount() {
 			var _this2 = this;
 
-			console.log("Login - Base url is " + _Constants.DOMAIN_URL);
 			_axios2.default.get(_Constants.DOMAIN_URL + '/api/v1/user/session').then(function (response) {
 				if (response.status === 200) {
 					_this2.props.history.push('/home');

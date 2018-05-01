@@ -16,7 +16,6 @@ export default class LoginPage extends React.Component {
 	}
 
 	componentDidMount() {
-        console.log("Login - Base url is " + DOMAIN_URL);
 		axios.get(`${DOMAIN_URL}/api/v1/user/session`)
         .then((response) => {
             if (response.status === 200) {

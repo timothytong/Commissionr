@@ -228,8 +228,30 @@ var PostRouter = function () {
             return this.googleClient.reverseGeocode({
                 latlng: [post.latitude, post.longitude]
             }, function (error, data) {
+                post.city = 'Unknown';
+                post.state = 'Unknown';
+                post.country = 'Unknown';
+
                 if (error === null && data.json.results.length !== 0) {
-                    post.formattedAddress = data.json.results[0].formatted_address;
+                    var _formattedAddress = data.json.results[0].formatted_address;
+
+                    post.formattedAddress = _formattedAddress;
+
+                    var components = _formattedAddress.split(',');
+                    var trimmedComponents = components.map(function (component) {
+                        return component.trim();
+                    });
+                    var length = trimmedComponents.length;
+
+                    if (length > 0) {
+                        post.country = trimmedComponents[length - 1];
+                    }
+                    if (length > 1) {
+                        post.state = trimmedComponents[length - 2];
+                    }
+                    if (length > 2) {
+                        post.city = trimmedComponents[length - 3];
+                    }
                 } else {
                     var rawData = 'Latitude (' + post.latitude + '), Longitude (' + post.longitude + ')';
                     post.formattedAddress = rawData;
@@ -267,6 +289,9 @@ var PostRouter = function () {
                         longitude: post.longitude,
                         latitude: post.latitude,
                         contact: post.contact,
+                        city: post.city,
+                        state: post.state,
+                        country: post.country,
                         description: post.description,
                         formatted_address: post.formattedAddress,
                         submitter_user_id: post.submitterUserId
