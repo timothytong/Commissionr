@@ -8,10 +8,6 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Logger = require('../utils/Logger');
-
-var _Logger2 = _interopRequireDefault(_Logger);
-
 var _express = require('express');
 
 var _user = require('../models/user');
@@ -26,8 +22,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var logger = new _Logger2.default();
-var DB_ERROR = 'An error with the query has occurred.';
+var SALT_ROUNDS = 10;
 
 var UserRouter = function () {
 
@@ -109,7 +104,6 @@ var UserRouter = function () {
                     });
                 }
             }).catch(function (err) {
-                logger.error(errorMsg, err, err.message);
                 return res.status(400).json({
                     message: errorMsg,
                     error: err.message
@@ -181,7 +175,6 @@ var UserRouter = function () {
                         return _this.updateUser(editInfo, userId, onSuccessHandler, onErrorHandler);
                     }
                 }).catch(function (err) {
-                    logger.error(errorMsg, err, err.message);
                     return res.status(400).json({
                         message: errorMsg,
                         error: err.message
@@ -198,31 +191,36 @@ var UserRouter = function () {
 
             var username = body.username;
             var password = body.password;
-            var errorMsg = 'Invalid username or password.';
 
             _user2.default.userDb.findOne({
                 where: {
                     user_name: username,
-                    password: password,
                     active: true
                 }
             }).then(function (data) {
                 if (!!data) {
-                    req.session.key = data.dataValues;
-                    return res.status(200).json({
-                        message: 'Login successful.'
+                    var user = data.dataValues;
+                    _bcryptjs2.default.compare(password, user.password, function (err, correct) {
+                        if (!err && correct) {
+                            req.session.key = data.dataValues;
+                            return res.status(200).json({
+                                message: 'Login successful.'
+                            });
+                        }
+                        return res.status(400).json({
+                            message: 'Invalid username or password'
+                        });
                     });
                 } else {
-                    return res.status(400).json({
-                        message: errorMsg,
-                        error: err.message
+                    return res.status(404).json({
+                        message: 'User ' + username + ' does not exist',
+                        error: err
                     });
                 }
             }).catch(function (err) {
-                logger.error(errorMsg, err, err.message);
-                return res.status(400).json({
-                    message: errorMsg,
-                    error: err.message
+                return res.status(500).json({
+                    message: 'Unknown error',
+                    error: err
                 });
             });
         }
@@ -269,7 +267,6 @@ var UserRouter = function () {
                         });
                     }
                 }).catch(function (err) {
-                    logger.error(errorMsg, err, err.message);
                     return res.status(400).json({
                         message: errorMsg,
                         error: err.message
@@ -301,7 +298,6 @@ var UserRouter = function () {
                     });
                 }
             }).catch(function (err) {
-                logger.error(errorMsg, err, err.message);
                 return res.status(400).json({
                     message: errorMsg,
                     error: err.message
@@ -313,44 +309,48 @@ var UserRouter = function () {
         value: function createUser(req, res) {
             var body = req.body;
 
-            var params = {
-                username: body.username,
-                password: body.password,
-                email: body.email
-            };
-            var errorMsg = 'User already exists';
-
-            checkUserNameExists(params.username).then(function (data) {
-                if (!!data) {
-                    return res.status(400).json({
-                        message: errorMsg,
-                        error: err.message
-                    });
-                } else {
-                    errorMsg = 'Failed to create user.';
-
-                    _user2.default.userDb.create({
-                        user_name: params.username,
-                        password: params.password,
-                        email: params.email,
-                        active: true
-                    }).then(function (data) {
-                        return res.status(200).json({
-                            message: 'User created.'
-                        });
-                    }).catch(function (err) {
-                        logger.error(errorMsg, err, err.message);
-                        return res.status(400).json({
-                            message: errorMsg,
-                            error: err.message
-                        });
+            _bcryptjs2.default.hash(body.password, SALT_ROUNDS, function (err, hash) {
+                if (!!err) {
+                    return res.status(500).json({
+                        message: 'Unable to hash password',
+                        error: err
                     });
                 }
-            }).catch(function (err) {
-                logger.error(errorMsg, err, err.message);
-                return res.status(400).json({
-                    message: errorMsg,
-                    error: err.message
+
+                var params = {
+                    username: body.username,
+                    password: hash,
+                    email: body.email
+                };
+
+                checkUserNameExists(params.username).then(function (data) {
+                    if (!!data) {
+                        return res.status(400).json({
+                            message: 'User already exists',
+                            error: 'Known error'
+                        });
+                    } else {
+                        _user2.default.userDb.create({
+                            user_name: params.username,
+                            password: params.password,
+                            email: params.email,
+                            active: true
+                        }).then(function (data) {
+                            return res.status(200).json({
+                                message: 'User created.'
+                            });
+                        }).catch(function (err) {
+                            return res.status(400).json({
+                                message: 'Unable to create user',
+                                error: err
+                            });
+                        });
+                    }
+                }).catch(function (err) {
+                    return res.status(500).json({
+                        message: 'Unknown error',
+                        error: err
+                    });
                 });
             });
         }
