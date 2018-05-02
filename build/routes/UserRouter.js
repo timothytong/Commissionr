@@ -212,14 +212,14 @@ var UserRouter = function () {
                         });
                     });
                 } else {
-                    return res.status(404).json({
-                        message: 'User ' + username + ' does not exist',
+                    return res.status(500).json({
+                        message: 'Unknown error',
                         error: err
                     });
                 }
             }).catch(function (err) {
-                return res.status(500).json({
-                    message: 'Unknown error',
+                return res.status(404).json({
+                    message: 'User ' + username + ' does not exist',
                     error: err
                 });
             });
