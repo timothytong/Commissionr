@@ -8,10 +8,6 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Logger = require('../utils/Logger');
-
-var _Logger2 = _interopRequireDefault(_Logger);
-
 var _express = require('express');
 
 var _user = require('../models/user');
@@ -30,6 +26,10 @@ var _bcryptjs = require('bcryptjs');
 
 var _bcryptjs2 = _interopRequireDefault(_bcryptjs);
 
+var _Database = require('../models/Database');
+
+var _Database2 = _interopRequireDefault(_Database);
+
 var _maps = require('@google/maps');
 
 var _maps2 = _interopRequireDefault(_maps);
@@ -37,9 +37,6 @@ var _maps2 = _interopRequireDefault(_maps);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var logger = new _Logger2.default();
-var DB_ERROR = 'An error with the query has occurred.';
 
 var PostRouter = function () {
 
@@ -52,7 +49,7 @@ var PostRouter = function () {
         // instantiate the express.Router
         this.router = (0, _express.Router)();
         var googleMapsClient = _maps2.default.createClient({
-            key: 'AIzaSyCqdarCsFQeR7h6Kl643pyk6c8sXxlkHO0'
+            key: process.env.GOOGLE_API_KEY
         });
         this.googleClient = googleMapsClient;
         this.path = path;
@@ -106,7 +103,6 @@ var PostRouter = function () {
                     });
                 }
             }).catch(function (err) {
-                logger.error(errorMsg, err, err.message);
                 return res.status(401).json({ message: errorMsg });
             });
         }
@@ -140,7 +136,6 @@ var PostRouter = function () {
                             data: data
                         });
                     }).catch(function (err) {
-                        logger.error(errorMsg, err, err.message);
                         return res.status(400).json({ message: errorMsg });
                     });
                 } else {
@@ -149,7 +144,6 @@ var PostRouter = function () {
                     });
                 }
             }).catch(function (err) {
-                logger.error(errorMsg, err, err.message);
                 return res.status(401).json({ message: errorMsg });
             });
         }
@@ -175,7 +169,6 @@ var PostRouter = function () {
                         data: data
                     });
                 }).catch(function (err) {
-                    logger.error(errorMsg, err, err.message);
                     return res.status(400).json({ message: errorMsg });
                 });
             } else {
@@ -210,7 +203,6 @@ var PostRouter = function () {
                         });
                     }
                 }).catch(function (err) {
-                    logger.error(errorMsg, err, err.message);
                     return res.status(400).json({
                         message: errorMsg,
                         error: err.message
@@ -276,48 +268,59 @@ var PostRouter = function () {
                 description: body.description,
                 submitterUserId: req.session.key['id']
             };
+
             if (params.longitude < -180 || params.longitude > 180 || params.latitude < -90 || params.latitude > 90) {
                 return res.status(400).json({
                     message: 'Invalid longitude-latitude combination.'
                 });
             }
+
             this.reverseGeocode(params, function (post) {
-                var errorMsg = 'Unable to create post.';
                 if (!!req.session.key) {
-                    _post2.default.postDb.create({
-                        name: post.name,
-                        last_seen: post.lastSeen,
-                        reward: post.reward,
-                        longitude: post.longitude,
-                        latitude: post.latitude,
-                        contact: post.contact,
-                        city: post.city,
-                        state: post.state,
-                        country: post.country,
-                        description: post.description,
-                        formatted_address: post.formattedAddress,
-                        submitter_user_id: post.submitterUserId
-                    }).then(function (data) {
-                        var additionalAttributes = body.additionalAttributes.map(function (attr) {
-                            attr.post_id = data.id;
-                            return attr;
-                        });
-                        _attribute2.default.attributeDb.bulkCreate(additionalAttributes, { individualHooks: true }).then(function (data) {
-                            return res.status(200).json({
-                                message: 'Post created.'
+                    return _Database2.default.transaction(function (t) {
+                        console.log(' = Creating post');
+                        return _post2.default.postDb.create({
+                            name: post.name,
+                            last_seen: post.lastSeen,
+                            reward: post.reward,
+                            longitude: post.longitude,
+                            latitude: post.latitude,
+                            contact: post.contact,
+                            city: post.city,
+                            state: post.state,
+                            country: post.country,
+                            description: post.description,
+                            formatted_address: post.formattedAddress,
+                            submitter_user_id: post.submitterUserId
+                        }, { transaction: t }).then(function (data) {
+                            console.log(' == Creating attributes');
+                            var additionalAttributes = body.additionalAttributes.map(function (attr) {
+                                attr.post_id = data.id;
+                                return attr;
+                            });
+                            return _attribute2.default.attributeDb.bulkCreate(additionalAttributes, {
+                                individualHooks: true,
+                                transaction: t
+                            }).catch(function (err) {
+                                console.log(" == Bad attribute(s)");
+                                console.log(err);
+                                throw err;
                             });
                         }).catch(function (err) {
-                            logger.error(errorMsg, err, err.message);
-                            return res.status(400).json({
-                                message: errorMsg,
-                                error: err.message
-                            });
+                            console.log(" = Bad post");
+                            console.log(err);
+                            throw err;
+                        });
+                    }).then(function (data) {
+                        console.log("Committing");
+                        return res.status(200).json({
+                            message: 'Post created.'
                         });
                     }).catch(function (err) {
-                        logger.error(errorMsg, err, err.message);
-                        return res.status(400).json({
-                            message: errorMsg,
-                            error: err.message
+                        console.log("Rollback");
+                        return res.status(500).json({
+                            message: 'Unable to create this post, please try again.',
+                            error: err
                         });
                     });
                 } else {
@@ -369,7 +372,6 @@ var PostRouter = function () {
                         });
                     }
                 }).catch(function (err) {
-                    logger.error(errorMsg, err, err.message);
                     return res.status(400).json({
                         message: errorMsg,
                         error: err.message

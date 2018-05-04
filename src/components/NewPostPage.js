@@ -86,7 +86,7 @@ export default class NewPostPage extends React.Component {
             })
             .catch((error) => {
                 console.log(error);
-                this.setState({ errorMessage: error.response.data.error.replace(/notNull Violation: /g,"")});
+                this.setState({ errorMessage: error.response.data.message });
             });
 	}
 

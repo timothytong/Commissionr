@@ -131,7 +131,7 @@ var NewPostPage = function (_React$Component) {
 				}
 			}).catch(function (error) {
 				console.log(error);
-				_this2.setState({ errorMessage: error.response.data.error.replace(/notNull Violation: /g, "") });
+				_this2.setState({ errorMessage: error.response.data.message });
 			});
 		}
 	}, {

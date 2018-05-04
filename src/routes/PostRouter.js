@@ -2,12 +2,12 @@
 
 'use strict';
 
-import Logger from '../utils/Logger';
 import { Router }  from 'express';
 import UserModels from '../models/user';
 import PostModels from '../models/post';
 import AttributeModels from '../models/attribute';
 import bcrypt from 'bcryptjs';
+import db from '../models/Database';
 import googleMaps from '@google/maps';
 
 type CreatePostParams = {
@@ -22,9 +22,6 @@ type CreatePostParams = {
     submitterUserId: number,
 };
 
-const logger = new Logger();
-const DB_ERROR = 'An error with the query has occurred.';
-
 export default class PostRouter {
     // these fields must be type annotated, or Flow will complain!
     router: Router;
@@ -36,7 +33,7 @@ export default class PostRouter {
         // instantiate the express.Router
         this.router = Router();
         const googleMapsClient = googleMaps.createClient({
-            key: 'AIzaSyCqdarCsFQeR7h6Kl643pyk6c8sXxlkHO0'
+            key: process.env.GOOGLE_API_KEY,
         });
         this.googleClient = googleMapsClient;
         this.path = path;
@@ -85,7 +82,6 @@ export default class PostRouter {
                 });
             }
         }).catch((err) => {
-            logger.error(errorMsg, err, err.message);
             return res.status(401).json({message: errorMsg});
         });
     }
@@ -120,7 +116,6 @@ export default class PostRouter {
                         data
                     });
                 }).catch((err) => {
-                    logger.error(errorMsg, err, err.message);
                     return res.status(400).json({message: errorMsg});
                 });
             } else {
@@ -129,7 +124,6 @@ export default class PostRouter {
                 });
             }
         }).catch((err) => {
-            logger.error(errorMsg, err, err.message);
             return res.status(401).json({message: errorMsg});
         });
 
@@ -157,7 +151,6 @@ export default class PostRouter {
                     data
                 });
             }).catch((err) => {
-                logger.error(errorMsg, err, err.message);
                 return res.status(400).json({message: errorMsg});
             });
         } else {
@@ -191,7 +184,6 @@ export default class PostRouter {
                     });
                 }
             }).catch((err) => {
-                logger.error(errorMsg, err, err.message);
                 return res.status(400).json({
                     message: errorMsg,
                     error: err.message,
@@ -204,7 +196,7 @@ export default class PostRouter {
         }
     }
 
-    reverseGeocode(post: CreatePostParams, onComplete: (Object) => void) {
+    reverseGeocode(post, onComplete) {
         return this.googleClient.reverseGeocode({
             latlng: [post.latitude, post.longitude],
         }, (error, data) => {
@@ -243,7 +235,7 @@ export default class PostRouter {
 
     createPost(req: $Request, res: $Response): void {
         const { body } = req;
-        const params : CreatePostParams = {
+        const params = {
             name: body.name,
             lastSeen: body.lastSeen,
             reward: body.reward,
@@ -253,51 +245,64 @@ export default class PostRouter {
             description: body.description,
             submitterUserId: req.session.key['id'],
         };
+
         if (params.longitude < -180 || params.longitude > 180 || params.latitude < -90 || params.latitude > 90) {
             return res.status(400).json({
                 message: 'Invalid longitude-latitude combination.',
             });
         }
+
         this.reverseGeocode(params, (post) => {
-            let errorMsg : string = 'Unable to create post.';
             if (!!req.session.key) {
-                PostModels.postDb.create({
-                    name: post.name,
-                    last_seen: post.lastSeen,
-                    reward: post.reward,
-                    longitude: post.longitude,
-                    latitude: post.latitude,
-                    contact: post.contact,
-                    city: post.city,
-                    state: post.state,
-                    country: post.country,
-                    description: post.description,
-                    formatted_address: post.formattedAddress,
-                    submitter_user_id: post.submitterUserId,
-                }).then((data) => {
-                    const additionalAttributes = body.additionalAttributes.map((attr) => {
-                        attr.post_id = data.id;
-                        return attr;
-                    });
-                    AttributeModels.attributeDb.bulkCreate(additionalAttributes, {individualHooks: true})
-                    .then((data) => {
-                        return res.status(200).json({
-                            message: 'Post created.',
+                return db.transaction((t) => {
+                    console.log(' = Creating post');
+                    return PostModels.postDb.create({
+                        name: post.name,
+                        last_seen: post.lastSeen,
+                        reward: post.reward,
+                        longitude: post.longitude,
+                        latitude: post.latitude,
+                        contact: post.contact,
+                        city: post.city,
+                        state: post.state,
+                        country: post.country,
+                        description: post.description,
+                        formatted_address: post.formattedAddress,
+                        submitter_user_id: post.submitterUserId,
+                    }, {transaction: t}).then((data) => {
+                        console.log(' == Creating attributes');
+                        const additionalAttributes = body.additionalAttributes.map((attr) => {
+                            attr.post_id = data.id;
+                            return attr;
                         });
+                        return AttributeModels.attributeDb.bulkCreate(additionalAttributes, {
+                            individualHooks: true,
+                            transaction: t,
+                        }).catch((err) => {
+                            console.log(" == Bad attribute(s)");
+                            console.log(err);
+                            throw err;
+                        })
+
                     }).catch((err) => {
-                        logger.error(errorMsg, err, err.message);
-                        return res.status(400).json({
-                            message: errorMsg,
-                            error: err.message,
-                        });
+                        console.log(" = Bad post");
+                        console.log(err);
+                        throw err;
+                    })
+
+                }).then((data) => {
+                    console.log("Committing");
+                    return res.status(200).json({
+                        message: 'Post created.',
                     });
                 }).catch((err) => {
-                    logger.error(errorMsg, err, err.message);
-                    return res.status(400).json({
-                        message: errorMsg,
-                        error: err.message,
+                    console.log("Rollback");
+                    return res.status(500).json({
+                        message: 'Unable to create this post, please try again.',
+                        error: err,
                     });
                 })
+
             } else {
                 return res.status(401).json({
                     message: 'User not authenticated.'
@@ -345,7 +350,6 @@ export default class PostRouter {
                     });
                 }
             }).catch((err) => {
-                logger.error(errorMsg, err, err.message);
                 return res.status(400).json({
                     message: errorMsg,
                     error: err.message,
