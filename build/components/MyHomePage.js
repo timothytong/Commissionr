@@ -45,7 +45,8 @@ var MyHomePage = function (_React$Component) {
         var _this = _possibleConstructorReturn(this, (MyHomePage.__proto__ || Object.getPrototypeOf(MyHomePage)).call(this, props));
 
         _this.state = {
-            loading: true
+            loading: true,
+            errorMessage: ''
         };
         return _this;
     }
@@ -68,10 +69,27 @@ var MyHomePage = function (_React$Component) {
     }, {
         key: 'render',
         value: function render() {
+            var errorMessage = '';
+
+            if (this.state.errorMessage.length > 0) {
+                errorMessage = _react2.default.createElement(
+                    'p',
+                    null,
+                    this.state.errorMessage
+                );
+            } else if (!!this.props.location.state) {
+                errorMessage = _react2.default.createElement(
+                    'p',
+                    null,
+                    this.props.location.state.message
+                );
+            }
+
             if (this.state.authenticated && !this.state.loading) {
                 return _react2.default.createElement(
                     'div',
                     null,
+                    errorMessage,
                     _react2.default.createElement(_Navbar2.default, { history: this.props.history, authenticated: this.state.authenticated }),
                     _react2.default.createElement(_PostsList2.default, { postsEditable: true }),
                     _react2.default.createElement(_NewPostButton2.default, { history: this.props.history })

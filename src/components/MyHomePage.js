@@ -10,6 +10,7 @@ export default class MyHomePage extends React.Component {
         super(props);
         this.state = {
             loading: true,
+            errorMessage: '',
         };
     }
 
@@ -28,9 +29,18 @@ export default class MyHomePage extends React.Component {
     }
 
     render() {
+  		let errorMessage = '';
+
+  		if (this.state.errorMessage.length > 0) {
+  			errorMessage = <p>{this.state.errorMessage}</p>;
+  		} else if (!!this.props.location.state) {
+  			errorMessage = <p>{this.props.location.state.message}</p>;
+		}
+
         if (this.state.authenticated && !this.state.loading) {
             return (
                 <div>
+                    {errorMessage}
                 	<Navbar history={this.props.history} authenticated={this.state.authenticated}/>
                     <PostsList postsEditable={true}/>
                     <NewPostButton history={this.props.history}/>

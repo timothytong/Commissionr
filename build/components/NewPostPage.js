@@ -120,28 +120,19 @@ var NewPostPage = function (_React$Component) {
 			var _this2 = this;
 
 			var data = _extends({}, this.state.post);
+			var url = this.state.isEditing ? _Constants.DOMAIN_URL + '/api/v1/post/edit/' + this.state.postId : _Constants.DOMAIN_URL + '/api/v1/post/create/';
+			var successMessage = this.state.isEditing ? "Post successfully updated!" : "Post successfully created!";
+
 			data.additionalAttributes = this.state.additionalAttrs;
-			if (this.state.isEditing === true) {
-				_axios2.default.post(_Constants.DOMAIN_URL + '/api/v1/post/edit/' + this.state.postId, data).then(function (response) {
-					if (response.status === 200 || response.status === 201) {
-						console.log('Successfully edited.');
-						_this2.props.history.push('/', { message: response.data.message });
-					}
-				}).catch(function (error) {
-					console.log(error);
-					_this2.setState({ errorMessage: error.response.data.error.replace(/notNull Violation: /g, "") });
-				});
-			} else {
-				_axios2.default.post(_Constants.DOMAIN_URL + '/api/v1/post/create/', data).then(function (response) {
-					if (response.status === 200 || response.status === 201) {
-						console.log('Successfully created.');
-						_this2.props.history.push('/', { message: response.data.message });
-					}
-				}).catch(function (error) {
-					console.log(error);
-					_this2.setState({ errorMessage: error.response.data.error.replace(/notNull Violation: /g, "") });
-				});
-			}
+			_axios2.default.post(url, data).then(function (response) {
+				if (response.status === 200 || response.status === 201) {
+					console.log(successMessage);
+					_this2.props.history.push('/home', { message: successMessage });
+				}
+			}).catch(function (error) {
+				console.log(error);
+				_this2.setState({ errorMessage: error.response.data.error.replace(/notNull Violation: /g, "") });
+			});
 		}
 	}, {
 		key: 'onSuggestSelect',

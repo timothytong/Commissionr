@@ -72,32 +72,22 @@ export default class NewPostPage extends React.Component {
 
 	handleCreatePostButtonClicked() {
 		const data = { ...this.state.post };
+        const url = this.state.isEditing ? `${DOMAIN_URL}/api/v1/post/edit/${this.state.postId}`
+            : `${DOMAIN_URL}/api/v1/post/create/`;
+        const successMessage = this.state.isEditing ? "Post successfully updated!" : "Post successfully created!";
+
 		data.additionalAttributes = this.state.additionalAttrs;
-		if (this.state.isEditing === true) {
-			axios.post(`${DOMAIN_URL}/api/v1/post/edit/${this.state.postId}`, data)
-	        .then((response) => {
-	            if (response.status === 200 || response.status === 201) {
-	                console.log('Successfully edited.');
-	                this.props.history.push('/', { message: response.data.message });
-	            }
-	        })
-	        .catch((error) => {
-	            console.log(error);
-	            this.setState({ errorMessage: error.response.data.error.replace(/notNull Violation: /g,"")});
-	        });
-		} else {
-			axios.post(`${DOMAIN_URL}/api/v1/post/create/`, data)
-	        .then((response) => {
-	            if (response.status === 200 || response.status === 201) {
-	                console.log('Successfully created.');
-	                this.props.history.push('/', { message: response.data.message });
-	            }
-	        })
-	        .catch((error) => {
-	            console.log(error);
-	            this.setState({ errorMessage: error.response.data.error.replace(/notNull Violation: /g,"")});
-	        });
-		}
+        axios.post(url, data)
+            .then((response) => {
+                if (response.status === 200 || response.status === 201) {
+                    console.log(successMessage);
+                    this.props.history.push('/home', { message: successMessage });
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                this.setState({ errorMessage: error.response.data.error.replace(/notNull Violation: /g,"")});
+            });
 	}
 
 	onSuggestSelect(suggest) {

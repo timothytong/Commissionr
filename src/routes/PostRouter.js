@@ -221,14 +221,16 @@ export default class PostRouter {
                 const trimmedComponents = components.map((component) => component.trim());
                 const length = trimmedComponents.length;
 
-                if (length > 0) {
+                if (length >= 1) {
                     post.country = trimmedComponents[length - 1];
                 }
-                if (length > 1) {
-                    post.state = trimmedComponents[length - 2];
-                }
                 if (length > 2) {
-                    post.city = trimmedComponents[length - 3];
+                    if (length === 3) {
+                        post.city = trimmedComponents[length - 2];
+                    } else {
+                        post.state = trimmedComponents[length - 2];
+                        post.city = trimmedComponents[length - 3];
+                    }
                 }
 
             } else {
