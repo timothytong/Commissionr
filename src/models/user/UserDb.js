@@ -29,6 +29,11 @@ const UserDb = Database.define(USERS_TABLE, {
         allowNull: false,
         defaultValue: true,
     },
+    verified: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
 });
 
 export default UserDb;

@@ -39,8 +39,9 @@ export default class SignUpPage extends React.Component {
 			})
 			.then((response) => {
 				console.log(response);
+                window.localStorage.setItem('commissionrEmailVerification', this.state.email);
 				this.setState({email: '', username: '', password: ''});
-				this.props.history.push('/', { message: response.data.message });
+				this.props.history.push('/emailVerificationStarted', { message: response.data.message });
 			})
 			.catch((error) => {
 				console.log(error);

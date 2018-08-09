@@ -3,6 +3,8 @@
 'use strict'
 
 import type { $Application, NextFunction } from 'express';
+import { REGEN_LOCAL_DB } from './utils/Args';
+
 import express from 'express';
 import session from 'express-session'
 import redis from 'redis';
@@ -13,8 +15,9 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import UserRouter from './routes/UserRouter';
 import PostRouter from './routes/PostRouter';
-import { REGEN_LOCAL_DB } from './utils/Args';
 import regenDb from './models/RegenDb';
+import firebase from 'firebase';
+
 
 export default class Api {
     // annotate with the express $Application type
@@ -26,6 +29,7 @@ export default class Api {
         this.middleware();
         this.routes();
         this.generateDb();
+        this.startFirebase();
     }
 
     // register middlewares
@@ -70,6 +74,20 @@ export default class Api {
         if (REGEN_LOCAL_DB || process.env.NODE_ENV === 'staging') {
             regenDb();
         }
+    }
+
+    // boot up firebase
+    startFirebase(): void {
+        const config = {
+            apiKey: "AIzaSyAWVLf122ZpbGYO91UIv3wcUSn9OHJhMiY",
+            authDomain: "commissionr-6d20d.firebaseapp.com",
+            databaseURL: "https://commissionr-6d20d.firebaseio.com",
+            projectId: "commissionr-6d20d",
+            storageBucket: "commissionr-6d20d.appspot.com",
+            messagingSenderId: "348933720333"
+        };
+
+        firebase.initializeApp(config);
     }
 }
 

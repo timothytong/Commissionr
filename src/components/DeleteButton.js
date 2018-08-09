@@ -1,6 +1,7 @@
+import {DOMAIN_URL} from '../utils/Constants';
+
 import React from 'react';
 import axios from 'axios';
-import {DOMAIN_URL} from '../utils/Constants';
 
 export default class DeleteButton extends React.Component {
     constructor(props) {

@@ -3,14 +3,11 @@
 'use strict';
 
 import { Router }  from 'express';
+import { DOMAIN_URL } from '../utils/Constants';
+
+import firebase from 'firebase';
 import UserModels from '../models/user';
 import bcrypt from 'bcryptjs';
-
-type CreateUserParams = {
-    username: string,
-    password: string,
-    email: string,
-};
 
 const SALT_ROUNDS = 10;
 
@@ -38,6 +35,7 @@ export default class UserRouter {
         this.router.post('/delete', this.deleteUser);
         this.router.post('/changePassword', this.changePassword);
         this.router.post('/updateProfile', this.updateProfile);
+        this.router.put('/verifyUser', this.verifyUser);
         this.router.get('/logout', this.logout);
         this.router.get('/session', this.getSession);
     }
@@ -89,6 +87,49 @@ export default class UserRouter {
                 error: err.message,
             });
         });
+    }
+
+    verifyUser(req: $Request, res: $Response): void {
+        const { body } = req;
+        const email = body.email;
+        const href = body.href;
+
+        if (firebase.auth().isSignInWithEmailLink(href)) {
+            firebase.auth().signInWithEmailLink(email, href)
+                .then(function(result) {
+                    UserModels.userDb.update({
+                        verified: true,
+                    },{
+                        where: {
+                            email,
+                        },
+                        returns: true,
+                    }).then((data) => {
+                        if (data[0] > 0) {
+                            return res.status(200).json({
+                                message: 'Successfully verified user.',
+                            });
+                        } else {
+                            return res.status(500).json({
+                                error: 'Error occurred while updating user verification status',
+                            });
+                        }
+                    }).catch((err) => {
+                        return res.status(500).json({
+                            error: err,
+                        });
+                    });
+                })
+                .catch((err) => {
+                    return res.status(500).json({
+                        error: err,
+                    });
+                });
+        } else {
+            return res.status(400).json({
+                error: 'Invalid verification link',
+            });
+        }
     }
 
     updateUser(editInfo, userId, successHandler, errorHandler) {
@@ -285,7 +326,7 @@ export default class UserRouter {
                 });
             }
 
-            const params : CreateUserParams = {
+            const params = {
                 username: body.username,
                 password: hash,
                 email: body.email,
@@ -303,12 +344,35 @@ export default class UserRouter {
                         password: params.password,
                         email: params.email,
                         active: true,
+                        verified: false,
                     }).then((data) => {
-                        return res.status(200).json({
-                            message: 'User created.',
-                        });
+                        console.log("REDIRECTING TO: " + DOMAIN_URL + "/verifyUser");
+                        const actionCodeSettings = {
+                            // URL you want to redirect back to. The domain (www.example.com) for this
+                            // URL must be whitelisted in the Firebase Console.
+                            url: `${DOMAIN_URL}/verifyUser`,
+                            // This must be true.
+                            handleCodeInApp: true,
+                        };
+                        firebase.auth().sendSignInLinkToEmail(params.email, actionCodeSettings)
+                            .then(function() {
+                                // The link was successfully sent. Inform the user.
+                                // Save the email locally so you don't need to ask the user for it again
+                                // if they open the link on the same device.
+                                return res.status(200).json({
+                                    message: 'User created.',
+                                });
+                            })
+                            .catch(function(error) {
+                                console.log('FIRE BASE ERROR: ');
+                                console.log(error);
+                                return res.status(500).json({
+                                    message: 'Unable to create user',
+                                    error: error,
+                                });
+                            });
                     }).catch((err) => {
-                        return res.status(400).json({
+                        return res.status(500).json({
                             message: 'Unable to create user',
                             error: err,
                         });
