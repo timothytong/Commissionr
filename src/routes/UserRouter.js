@@ -23,6 +23,7 @@ export default class UserRouter {
         this.path = path;
         // glue it all together
         this.updateProfile = this.updateProfile.bind(this);
+        this.createUser = this.createUser.bind(this);
         this.init();
     }
     /**
@@ -60,7 +61,6 @@ export default class UserRouter {
         const userId = req.session.key['id'];
         const password = body.password;
         const newPassword = body.newPassword;
-        let errorMsg = 'Incorrect password supplied.';
 
         UserModels.userDb.update({
             password: newPassword
@@ -76,15 +76,15 @@ export default class UserRouter {
                     message: 'Successfully changed password.',
                 });
             } else {
-                return res.status(400).json({
-                    message: errorMsg,
-                    error: err.message,
+                return res.status(500).json({
+                    message: 'Unexpected error occurred while updating password',
                 });
             }
         }).catch((err) => {
+            console.log(err);
             return res.status(400).json({
-                message: errorMsg,
-                error: err.message,
+                message: 'Unexpected error occurred while updating password',
+                error: err,
             });
         });
     }
@@ -155,7 +155,6 @@ export default class UserRouter {
         const userId = req.session.key['id'];
         const email = body.email;
         const username = body.username;
-        let errorMsg = 'Invalid username or email.';
         const onSuccessHandler = (data) => {
             req.session.key = data;
             return res.status(200).json({
@@ -164,8 +163,8 @@ export default class UserRouter {
         }
         const onErrorHandler = (err) => {
             return res.status(500).json({
-                message: errorMsg,
-                error: err.message,
+                message: 'Unexpected error while updating profile',
+                error: err,
             });
         }
         const editInfo = {};
@@ -192,8 +191,8 @@ export default class UserRouter {
                 }
             }).catch((err) => {
                 return res.status(400).json({
-                    message: errorMsg,
-                    error: err.message,
+                    message: 'Unexpected error while updating profile',
+                    error: err,
                 });
             });
         }
@@ -255,7 +254,6 @@ export default class UserRouter {
 
     deleteUser(req: $Request, res: $Response): void {
         const { body } = req;
-        let errorMsg = 'User cannot be deleted.';
 
         if (!!req.session.key) {
             const userId = req.session.key['id'];
@@ -273,15 +271,14 @@ export default class UserRouter {
                         message: 'Successfully deleted user.',
                     });
                 } else {
-                    return res.status(400).json({
-                        message: errorMsg,
-                        error: err.message,
+                    return res.status(500).json({
+                        message: 'Unknown error while deleting user',
                     });
                 }
             }).catch((err) => {
-                return res.status(400).json({
-                    message: errorMsg,
-                    error: err.message,
+                return res.status(500).json({
+                    message: 'Error occurred while deleting user',
+                    error: err,
                 });
             });
         } else {
@@ -294,12 +291,11 @@ export default class UserRouter {
     validateUser(req: $Request, res: $Response): void {
         const { body } = req;
         const username = body.username;
-        let errorMsg = 'User already exists.';
 
         checkUserNameExists(username).then((data) => {
             if (!!data) {
                 return res.status(400).json({
-                    message: errorMsg,
+                    message: 'User already exists.',
                     error: err.message,
                 });
             } else {
@@ -308,12 +304,29 @@ export default class UserRouter {
                 });
             }
         }).catch((err) => {
-            return res.status(400).json({
-                message: errorMsg,
+            console.log(err);
+            return res.status(500).json({
+                message: 'Unexpected error occurred while validating username',
                 error: err.message,
             });
         });
 
+    }
+
+    startVerificationProcess (email, successHandler, errorHandler) {
+        console.log("Processing email " + email + ", REDIRECTING TO: " + DOMAIN_URL + "/verifyUser");
+        const actionCodeSettings = {
+            url: `${DOMAIN_URL}/verifyUser`,
+            // This must be true.
+            handleCodeInApp: true,
+        };
+        firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings)
+            .then(() => successHandler())
+            .catch((err) => {
+                console.log('FIREBASE ERROR: ');
+                console.log(err);
+                errorHandler(err);
+            });
     }
 
     createUser(req: $Request, res: $Response): void {
@@ -345,35 +358,25 @@ export default class UserRouter {
                         email: params.email,
                         active: true,
                         verified: false,
-                    }).then((data) => {
-                        console.log("REDIRECTING TO: " + DOMAIN_URL + "/verifyUser");
-                        const actionCodeSettings = {
-                            // URL you want to redirect back to. The domain (www.example.com) for this
-                            // URL must be whitelisted in the Firebase Console.
-                            url: `${DOMAIN_URL}/verifyUser`,
-                            // This must be true.
-                            handleCodeInApp: true,
-                        };
-                        firebase.auth().sendSignInLinkToEmail(params.email, actionCodeSettings)
-                            .then(function() {
-                                // The link was successfully sent. Inform the user.
-                                // Save the email locally so you don't need to ask the user for it again
-                                // if they open the link on the same device.
-                                return res.status(200).json({
-                                    message: 'User created.',
-                                });
-                            })
-                            .catch(function(error) {
-                                console.log('FIRE BASE ERROR: ');
-                                console.log(error);
-                                return res.status(500).json({
-                                    message: 'Unable to create user',
-                                    error: error,
-                                });
+                    }).then(() => {
+                        const onSuccess = () => {
+                            // The link was successfully sent. Inform the user.
+                            // Save the email locally so you don't need to ask the user for it again
+                            // if they open the link on the same device.
+                            return res.status(200).json({
+                                message: 'User created.',
                             });
+                        };
+                        const onError = (err) => {
+                            return res.status(500).json({
+                                message: 'Unable to create user',
+                                error: err,
+                            });
+                        };
+                        this.startVerificationProcess(params.email, onSuccess, onError);
                     }).catch((err) => {
                         return res.status(500).json({
-                            message: 'Unable to create user',
+                            message: 'User created, but verification service is down. Please log in to start the verification process',
                             error: err,
                         });
                     })
@@ -388,6 +391,7 @@ export default class UserRouter {
     }
 
 }
+
 
 function checkUserNameExists (username) {
     return UserModels.userDb.findOne({
