@@ -5,14 +5,14 @@ import axios from 'axios';
 import React from 'react';
 
 export default class EmailVerificationResultPage extends React.Component {
-	constructor(props) {
-		super(props);
+    constructor(props) {
+        super(props);
 
         this.state = {
             loading: true,
             verificationSuccess: false,
         };
-	}
+    }
 
     componentDidMount() {
         // Confirm the link is a sign-in with email link.
@@ -40,13 +40,13 @@ export default class EmailVerificationResultPage extends React.Component {
 
     }
 
-  	render() {
+    render() {
         if (this.state.loading) {
-	        return (
-	            <div>
-		    		<h1>Verifying...</h1>
-		    	</div>
-	        );
+            return (
+                <div>
+                    <h1>Verifying...</h1>
+                </div>
+            );
         }
         if (this.state.verificationSuccess) {
             return (
@@ -55,10 +55,10 @@ export default class EmailVerificationResultPage extends React.Component {
                 </div>
             );
         }
-	    return (
-	        <div>
-				<h1>Verification failed, resend verification email</h1>
-			</div>
-	    );
-  	}
+        return (
+            <div>
+                <h1>Verification failed, resend verification email</h1>
+            </div>
+        );
+    }
 }
