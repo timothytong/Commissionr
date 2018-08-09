@@ -6,9 +6,9 @@ import Database from './Database';
 export default function () {
     Database.sync({ force: true })
         .then(() => UserModels.userDb.bulkCreate([
-            { user_name: 'laetansx', email: 'laetansx@gmail.com', password: '$2a$10$07AA5rKbjovcnZVsY36LIOJXcAwOdTPqqops0Lbv9GVhzILG0cAuO', active: true },
-            { user_name: 'ckhyena', email: 'ckhyena@gmail.com', password: '$2a$10$07AA5rKbjovcnZVsY36LIOJXcAwOdTPqqops0Lbv9GVhzILG0cAuO', active: true },
-            { user_name: 'cupidthedeer', email: 'cupidthedeer@jail.com', password: '$2a$10$07AA5rKbjovcnZVsY36LIOJXcAwOdTPqqops0Lbv9GVhzILG0cAuO', active: false },
+            { user_name: 'laetansx', email: 'laetansx@gmail.com', password: '$2a$10$07AA5rKbjovcnZVsY36LIOJXcAwOdTPqqops0Lbv9GVhzILG0cAuO', active: true, verified: false },
+            { user_name: 'ckhyena', email: 'ckhyena@gmail.com', password: '$2a$10$07AA5rKbjovcnZVsY36LIOJXcAwOdTPqqops0Lbv9GVhzILG0cAuO', active: true, verified: false },
+            { user_name: 'cupidthedeer', email: 'cupidthedeer@jail.com', password: '$2a$10$07AA5rKbjovcnZVsY36LIOJXcAwOdTPqqops0Lbv9GVhzILG0cAuO', active: false, verified: false },
         ]))
         .then(() => PostModels.postDb.bulkCreate([
         	{
