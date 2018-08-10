@@ -1,9 +1,12 @@
+import {DOMAIN_URL} from '../utils/Constants';
+
 import React from 'react';
 import axios from 'axios';
+
 import Navbar from './Navbar';
 import PostsList from './PostsList';
 import NewPostButton from './NewPostButton';
-import {DOMAIN_URL} from '../utils/Constants';
+import UserVerificationButton from './UserVerificationButton';
 
 export default class MyHomePage extends React.Component {
     constructor(props) {
@@ -40,8 +43,9 @@ export default class MyHomePage extends React.Component {
         if (this.state.authenticated && !this.state.loading) {
             return (
                 <div>
-                    {errorMessage}
+                    <UserVerificationButton />
                 	<Navbar history={this.props.history} authenticated={this.state.authenticated}/>
+                    {errorMessage}
                     <PostsList postsEditable={true}/>
                     <NewPostButton history={this.props.history}/>
                 </div>

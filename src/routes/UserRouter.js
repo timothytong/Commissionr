@@ -38,6 +38,7 @@ export default class UserRouter {
         this.router.post('/changePassword', this.changePassword);
         this.router.post('/updateProfile', this.updateProfile);
         this.router.put('/verifyUser', this.verifyUser);
+        this.router.get('/checkUserVerified', this.checkUserVerified);
         this.router.get('/logout', this.logout);
         this.router.get('/session', this.getSession);
         this.router.get('/startVerification', this.startVerification);
@@ -64,19 +65,49 @@ export default class UserRouter {
         return this.startVerificationProcess(email, onSuccess, onError);
     }
 
-    getSession(req: $Request, res: $Response) {
-        if (!!req.session.key) {
-            console.log(req.session.key['id']);
-            return res.status(200).json({
-                message: 'User is logged in',
-                user_name: req.session.key.user_name,
-                email: req.session.key.email,
+    checkUserVerified(req: $Request, res: $Response) {
+        if (!req.session.key) {
+            return res.status(401).json({
+                message: 'User not logged in',
+            })
+        }
+
+        UserModels.userDb.findOne({
+            where: {
+                active: true,
+                id: req.session.key.id,
+            }
+        }).then((data) => {
+            if (!!data) {
+                const user = data.dataValues;
+                return res.status(200).json({
+                    verified: user.verified,
+                });
+            } else {
+                return res.status(500).json({
+                    message: 'Unknown error',
+                });
+            }
+        }).catch((err) => {
+            return res.status(404).json({
+                message: `User ${username} does not exist`,
+                error: err,
             });
-        } else {
+        });
+    }
+
+    getSession(req: $Request, res: $Response) {
+        if (!req.session.key) {
             return res.status(401).json({
                 message: 'User not logged in'
             })
         }
+        console.log(req.session.key['id']);
+        return res.status(200).json({
+            message: 'User is logged in',
+            user_name: req.session.key.user_name,
+            email: req.session.key.email,
+        });
     }
 
     changePassword(req: $Request, res: $Response) {
