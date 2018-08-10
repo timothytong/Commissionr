@@ -24,12 +24,13 @@ export default class UserRouter {
         // glue it all together
         this.updateProfile = this.updateProfile.bind(this);
         this.createUser = this.createUser.bind(this);
+        this.startVerification = this.startVerification.bind(this);
         this.init();
     }
     /**
     * Attach route handlers to their endpoints.
     */
-    init(): void {
+    init() {
         this.router.post('/create', this.createUser);
         this.router.post('/validate', this.validateUser);
         this.router.post('/login', this.loginUser);
@@ -39,9 +40,31 @@ export default class UserRouter {
         this.router.put('/verifyUser', this.verifyUser);
         this.router.get('/logout', this.logout);
         this.router.get('/session', this.getSession);
+        this.router.get('/startVerification', this.startVerification);
     }
 
-    getSession(req: $Request, res: $Response): void {
+    startVerification(req: $Request, res: $Response) {
+        if (!req.session.key) {
+            return res.status(401).json({
+                message: 'User not logged in',
+            });
+        }
+        const email = req.session.key.email;
+        const onSuccess = () => {
+            return res.status(200).json({
+                message: 'Verification email sent.',
+            });
+        };
+        const onError = (err) => {
+            return res.status(500).json({
+                message: 'Unexpected error occurred while starting verification process.',
+                error: err,
+            });
+        };
+        return this.startVerificationProcess(email, onSuccess, onError);
+    }
+
+    getSession(req: $Request, res: $Response) {
         if (!!req.session.key) {
             console.log(req.session.key['id']);
             return res.status(200).json({
@@ -56,7 +79,7 @@ export default class UserRouter {
         }
     }
 
-    changePassword(req: $Request, res: $Response): void {
+    changePassword(req: $Request, res: $Response) {
         const { body } = req;
         const userId = req.session.key['id'];
         const password = body.password;
@@ -89,7 +112,7 @@ export default class UserRouter {
         });
     }
 
-    verifyUser(req: $Request, res: $Response): void {
+    verifyUser(req: $Request, res: $Response) {
         const { body } = req;
         const email = body.email;
         const href = body.href;
@@ -150,7 +173,7 @@ export default class UserRouter {
         });
     }
 
-    updateProfile(req: $Request, res: $Response): void {
+    updateProfile(req: $Request, res: $Response) {
         const { body } = req;
         const userId = req.session.key['id'];
         const email = body.email;
@@ -201,7 +224,7 @@ export default class UserRouter {
 
     }
 
-    loginUser(req: $Request, res: $Response): void {
+    loginUser(req: $Request, res: $Response) {
         const { body } = req;
         const username = body.username;
         const password = body.password;
@@ -239,7 +262,7 @@ export default class UserRouter {
         });
     }
 
-    logout(req: $Request, res: $Response): void {
+    logout(req: $Request, res: $Response) {
         if (!!req.session.key) {
             delete req.session.key;
             return res.status(200).json({
@@ -252,7 +275,7 @@ export default class UserRouter {
         }
     }
 
-    deleteUser(req: $Request, res: $Response): void {
+    deleteUser(req: $Request, res: $Response) {
         const { body } = req;
 
         if (!!req.session.key) {
@@ -288,7 +311,7 @@ export default class UserRouter {
         }
     }
 
-    validateUser(req: $Request, res: $Response): void {
+    validateUser(req: $Request, res: $Response) {
         const { body } = req;
         const username = body.username;
 
@@ -329,7 +352,7 @@ export default class UserRouter {
             });
     }
 
-    createUser(req: $Request, res: $Response): void {
+    createUser(req: $Request, res: $Response) {
         const { body } = req;
         bcrypt.hash(body.password, SALT_ROUNDS, (err, hash) => {
             if (!!err) {
@@ -360,9 +383,6 @@ export default class UserRouter {
                         verified: false,
                     }).then(() => {
                         const onSuccess = () => {
-                            // The link was successfully sent. Inform the user.
-                            // Save the email locally so you don't need to ask the user for it again
-                            // if they open the link on the same device.
                             return res.status(200).json({
                                 message: 'User created.',
                             });
