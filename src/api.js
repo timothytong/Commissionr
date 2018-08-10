@@ -91,7 +91,7 @@ export default class Api {
     }
 }
 
-function checkRedisConnect(req: $Request, res: $Response, next: NextFunction) {
+function checkRedisConnect(req, res, next) {
     if (!req.session) {
         return next(new Error('Redis not connected.'));
     }
