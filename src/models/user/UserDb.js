@@ -16,6 +16,10 @@ const UserDb = Database.define(USERS_TABLE, {
         type: DataTypes.TEXT,
         allowNull: false,
     },
+    display_name: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+    },
     email: {
         type: DataTypes.TEXT,
         allowNull: false,
@@ -24,12 +28,26 @@ const UserDb = Database.define(USERS_TABLE, {
         type: DataTypes.TEXT,
         allowNull: false,
     },
-    active: {
+    dob: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+    },
+    is_active: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true,
     },
-    verified: {
+    is_verified: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
+    is_merchant: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
+    show_nsfw: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
