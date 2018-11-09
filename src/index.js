@@ -1,5 +1,3 @@
-// @flow
-
 'use strict';
 
 import * as http from 'http';
@@ -56,8 +54,8 @@ function onError(error: ErrnoError): void {
 }
 
 function onListening(): void {
-  let addr: string = server.address();
-  let bind: string = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
+  let addr = server.address();
+  let bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
   logger(`Listening on ${bind}`);
   Database.authenticate().then(() => {
       console.log('Connection has been established successfully.');
