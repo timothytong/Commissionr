@@ -59,11 +59,9 @@ export default class Api {
     // connect resource routers
     routes(): void {
         const userRouter: UserRouter = new UserRouter();
-        const postRouter: PostRouter = new PostRouter();
 
         // attach it to our express app
         this.express.use(userRouter.path, checkRedisConnect, userRouter.router);
-        this.express.use(postRouter.path, checkRedisConnect, postRouter.router);
 
         this.express.use(express.static(path.join(__dirname, 'static')));
         this.express.get('/*', (req, res) => res.sendFile(path.resolve(__dirname, 'static', 'index.html')));

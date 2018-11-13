@@ -1,4 +1,4 @@
-// @ flow
+/*
 
 'use strict';
 
@@ -42,9 +42,6 @@ export default class PostRouter {
         this.init();
     }
 
-    /**
-    * Attach route handlers to their endpoints.
-    */
     init(): void {
         this.router.post('/create', this.createPost);
         this.router.delete('/delete/:id', this.deletePost);
@@ -420,3 +417,4 @@ export default class PostRouter {
     }
 
 }
+*/

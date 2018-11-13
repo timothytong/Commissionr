@@ -1,6 +1,6 @@
 import UserModels from './user';
-import PostModels from './post';
-import AttributeModels from './attribute';
+import CommissionFormModels from './commisionForm';
+import FormAttributeModels from './formAttribute';
 import Database from './Database';
 
 export default function () {
@@ -19,44 +19,40 @@ export default function () {
                 show_nsfw: false,
             }
         ]))
-        .then(() => PostModels.postDb.bulkCreate([
+        .then(() => CommissionFormModels.commissionFormDb.bulkCreate([
         	{
-        		name: 'Ck',
-        		last_seen: '2017-11-29T05:40:35.324Z',
-        		reward: 0.00,
-        		longitude: 45,
-        		latitude: 50,
-                city: 'Seattle',
-                state: 'WA',
-                country: 'USA',
-        		contact: 'hello@gmail.com',
-        		description: 'Blue yeen',
-        		found: false,
-        		found_user_id: null,
-                formatted_address: '1 Bellvue Ave, Seattle, WA, USA',
-        		deleted: false,
-        		submitter_user_id: 1
+                id: 1,
+                is_open: true,
+                user_id: 1,
+        	},
+        	{
+                id: 2,
+                is_open: false,
+                user_id: 1,
         	}
         ]))
-        .then(() => AttributeModels.attributeDb.bulkCreate([
+        .then(() => FormAttributeModels.formAttributeDb.bulkCreate([
             {
                 id: 1,
-                key: 'sashimi',
-                value: 'salmon',
-                post_id: 1,
+                attr: 'Attr for form 1',
+                description: 'desc 1',
+                additional_cost: 0,
+                comm_form_id: 1,
             },
             {
                 id: 2,
-                key: 'cringe',
-                value: 'furry',
-                post_id: 2,
+                attr: 'Attr for form 2',
+                description: 'desc 2',
+                additional_cost: 5,
+                comm_form_id: 2,
             },
             {
                 id: 3,
-                key: 'oh hai',
-                value: 'mark',
-                post_id: 2,
-            }
+                attr: 'Attr for form 3',
+                description: 'desc 3',
+                additional_cost: 10,
+                comm_form_id: 1,
+            },
 
         ]))
         .catch((e) => console.log('Error: ' + e + '\nHint: Is your postgres running?'));
