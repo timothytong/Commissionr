@@ -1,14 +1,14 @@
 'use strict';
 
-import CommissionFormDb from '../commisionForm/CommissionFormDb';
-import UserDb from './UserDb';
+import CommissionForm from '../commisionForm/CommissionForm';
+import User from './User';
 
 // define DB relationships
-UserDb.hasMany(CommissionFormDb, {
+User.hasMany(CommissionForm, {
     foreignKey: 'comm_form_id',
     targetKey: 'id',
 });
 
 export default {
-    userDb: UserDb,
+    user: User,
 }

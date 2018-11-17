@@ -5,7 +5,7 @@ import { DataTypes } from 'sequelize';
 
 const USERS_TABLE = 'users';
 
-const UserDb = Database.define(USERS_TABLE, {
+const User = Database.define(USERS_TABLE, {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -13,19 +13,19 @@ const UserDb = Database.define(USERS_TABLE, {
         allowNull: false,
     },
     user_name: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false,
     },
     display_name: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false,
     },
     email: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false,
     },
     password: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false,
     },
     dob: {
@@ -54,4 +54,4 @@ const UserDb = Database.define(USERS_TABLE, {
     },
 });
 
-export default UserDb;
+export default User;

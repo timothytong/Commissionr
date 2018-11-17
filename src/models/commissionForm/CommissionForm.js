@@ -2,11 +2,11 @@
 
 import Database from '../Database';
 import { DataTypes } from 'sequelize';
-import UserModels from '../user/UserDb';
+import UserModels from '../user/User';
 
 const COMMISSION_FORM_TABLE = 'commission_forms';
 
-const CommissionFormDb = Database.define(COMMISSION_FORM_TABLE, {
+const CommissionForm = Database.define(COMMISSION_FORM_TABLE, {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -22,9 +22,9 @@ const CommissionFormDb = Database.define(COMMISSION_FORM_TABLE, {
         type: DataTypes.INTEGER,
         allowNull: false,
         reference: {
-            model: UserModels.userDb,
+            model: UserModels.user,
         },
     },
 });
 
-export default CommissionFormDb;
+export default CommissionForm;
