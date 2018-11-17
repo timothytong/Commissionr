@@ -1,5 +1,6 @@
 import Database from './Database';
 
+import CommFormResponseModels from './commFormResponse';
 import CommissionFormModels from './commisionForm';
 import OfferModels from './offer';
 import ProductModels from './product';
@@ -80,6 +81,26 @@ export default function () {
                 form_content: '[]',
                 comm_form_id: 1,
                 product_id: 2,
+            },
+        ]))
+        .then(() => CommFormResponseModels.commFormResponse.bulkCreate([
+            {
+                id: 1,
+                content: '[]',
+                final_price: 15,
+                is_voided: false,
+                is_accepted: true,
+                user_id: 1,
+                comm_form_id: 1,
+            },
+            {
+                id: 2,
+                content: '[]',
+                final_price: 10,
+                is_voided: true,
+                is_accepted: false,
+                user_id: 1,
+                comm_form_id: 1,
             },
         ]))
         .catch((e) => console.log('Error: ' + e));
