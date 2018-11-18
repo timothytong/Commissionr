@@ -17,6 +17,4 @@ CommissionForm.belongsToMany(Product, {
     targetKey: 'id',
 });
 
-export default {
-    commissionForm: CommissionForm,
-};
+export default CommissionForm;

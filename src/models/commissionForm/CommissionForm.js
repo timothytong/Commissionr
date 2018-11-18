@@ -6,7 +6,7 @@ import UserModels from '../user/User';
 
 const COMMISSION_FORM_TABLE = 'commission_forms';
 
-const CommissionForm = Database.define(COMMISSION_FORM_TABLE, {
+export default Database.define(COMMISSION_FORM_TABLE, {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -30,5 +30,3 @@ const CommissionForm = Database.define(COMMISSION_FORM_TABLE, {
     timestamps: true,
     underscored: true,
 });
-
-export default CommissionForm;

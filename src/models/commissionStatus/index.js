@@ -15,8 +15,6 @@ CommissionStatus.belongsTo(Commission, {
     targetKey: 'id',
 });
 
-export default {
-    commissionStatus: CommissionStatus,
-}
+export default CommissionStatus;
 
 

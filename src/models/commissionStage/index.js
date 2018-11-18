@@ -9,7 +9,5 @@ CommissionStage.belongsTo(Product, {
     targetKey: 'id',
 });
 
-export default {
-    commissionStage: CommissionStage,
-};
+export default CommissionStage;
 

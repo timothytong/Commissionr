@@ -7,7 +7,7 @@ import CommissionStageModels from '../commissionStage/ComissionStage';
 
 const COMMISSION_STATUS_TABLE = 'commission_statuses';
 
-const CommissionStatus = Database.define(COMMISSION_STATUS_TABLE, {
+export default Database.define(COMMISSION_STATUS_TABLE, {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -38,6 +38,3 @@ const CommissionStatus = Database.define(COMMISSION_STATUS_TABLE, {
     timestamps: true,
     underscored: true,
 });
-
-export default CommissionStatus;
-

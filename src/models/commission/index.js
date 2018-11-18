@@ -15,7 +15,4 @@ Commission.belongsTo(CommissionForm, {
     targetKey: 'id',
 });
 
-export default {
-    commission: Commission,
-};
-
+export default Commission;

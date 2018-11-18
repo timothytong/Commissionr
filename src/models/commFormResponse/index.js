@@ -15,6 +15,4 @@ CommFormResponse.belongsTo(CommissionForm, {
     targetKey: 'id',
 });
 
-export default {
-    commFormResponse: CommFormResponse,
-};
+export default CommFormResponse;

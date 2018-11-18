@@ -1,16 +1,16 @@
 import Database from './Database';
 
-import CommFormResponseModels from './commFormResponse';
-import CommissionModels from './commission';
-import CommissionFormModels from './commissionForm';
-import CommissionStageModels from './commissionStage';
-import OfferModels from './offer';
-import ProductModels from './product';
-import UserModels from './user';
+import CommFormResponse from './commFormResponse';
+import Commission from './commission';
+import CommissionForm from './commissionForm';
+import CommissionStage from './commissionStage';
+import Offer from './offer';
+import Product from './product';
+import User from './user';
 
 export default function () {
     Database.sync({ force: true })
-        .then(() => UserModels.user.bulkCreate([
+        .then(() => User.bulkCreate([
             {
                 id: 1,
                 user_name: 'ckhyena',
@@ -40,7 +40,7 @@ export default function () {
                 updated_at: new Date(),
             }
         ]))
-        .then(() => CommissionFormModels.commissionForm.bulkCreate([
+        .then(() => CommissionForm.bulkCreate([
         	{
                 id: 1,
                 is_open: true,
@@ -63,7 +63,7 @@ export default function () {
                 updated_at: new Date(),
         	},
         ]))
-        .then(() => ProductModels.product.bulkCreate([
+        .then(() => Product.bulkCreate([
             {
                 id: 1,
                 base_price: 10.00,
@@ -104,7 +104,7 @@ export default function () {
                 updated_at: new Date(),
             },
         ]))
-        .then(() => OfferModels.offer.bulkCreate([
+        .then(() => Offer.bulkCreate([
             {
                 id: 1,
                 form_content: '[]',
@@ -122,7 +122,7 @@ export default function () {
                 updated_at: new Date(),
             },
         ]))
-        .then(() => CommFormResponseModels.commFormResponse.bulkCreate([
+        .then(() => CommFormResponse.bulkCreate([
             {
                 id: 1,
                 content: '[]',
@@ -144,7 +144,7 @@ export default function () {
                 updated_at: new Date(),
             },
         ]))
-        .then(() => CommissionModels.commission.bulkCreate([
+        .then(() => Commission.bulkCreate([
             {
                 id: 1,
                 final_price: 50.00,
@@ -177,7 +177,7 @@ export default function () {
                 comm_form_id: 2,
             },
         ]))
-        .then(() => CommissionStageModels.commissionStage.bulkCreate([
+        .then(() => CommissionStage.bulkCreate([
             {
                 id: 1,
                 description: 'Just one stage, simple!',

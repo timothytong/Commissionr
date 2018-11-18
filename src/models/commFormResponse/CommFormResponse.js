@@ -7,7 +7,7 @@ import UserModels from '../user/User';
 
 const COMM_FORM_RESPONSE_TABLE = 'comm_form_responses';
 
-const CommFormResponse = Database.define(COMM_FORM_RESPONSE_TABLE, {
+export default Database.define(COMM_FORM_RESPONSE_TABLE, {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -47,6 +47,4 @@ const CommFormResponse = Database.define(COMM_FORM_RESPONSE_TABLE, {
     timestamps: true,
     underscored: true,
 });
-
-export default CommFormResponse;
 

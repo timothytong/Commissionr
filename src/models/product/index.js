@@ -17,7 +17,4 @@ Product.belongsToMany(CommissionForm, {
     targetKey: 'id',
 });
 
-export default {
-    product: Product,
-}
-
+export default Product;

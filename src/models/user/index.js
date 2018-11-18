@@ -9,6 +9,4 @@ User.hasMany(CommissionForm, {
     targetKey: 'id',
 });
 
-export default {
-    user: User,
-}
+export default User;

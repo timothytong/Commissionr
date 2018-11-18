@@ -7,7 +7,7 @@ import UserModels from '../user/User';
 
 const COMMISSION_TABLE = 'commissions';
 
-const Commission = Database.define(COMMISSION_TABLE, {
+export default Database.define(COMMISSION_TABLE, {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -47,7 +47,4 @@ const Commission = Database.define(COMMISSION_TABLE, {
     timestamps: true,
     underscored: true,
 });
-
-export default Commission;
-
 

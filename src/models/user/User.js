@@ -5,7 +5,7 @@ import { DataTypes } from 'sequelize';
 
 const USERS_TABLE = 'users';
 
-const User = Database.define(USERS_TABLE, {
+export default Database.define(USERS_TABLE, {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -57,5 +57,3 @@ const User = Database.define(USERS_TABLE, {
     timestamps: true,
     underscored: true,
 });
-
-export default User;

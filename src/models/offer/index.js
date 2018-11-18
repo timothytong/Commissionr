@@ -2,7 +2,5 @@
 
 import Offer from './Offer';
 
-export default {
-    offer: Offer
-};
+export default Offer;
 

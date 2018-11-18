@@ -7,7 +7,7 @@ import ProductModels from '../product/Product';
 
 const COMMISSION_STAGE_TABLE = 'commission_stages';
 
-const CommissionStage = Database.define(COMMISSION_STAGE_TABLE, {
+export default Database.define(COMMISSION_STAGE_TABLE, {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -41,7 +41,4 @@ const CommissionStage = Database.define(COMMISSION_STAGE_TABLE, {
         },
     ],
 });
-
-export default CommissionStage;
-
 

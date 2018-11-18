@@ -7,7 +7,7 @@ import CommissionFormModels from '../commissionForm/CommissionForm';
 
 const PRODUCTS_TABLE = 'products';
 
-const Product = Database.define(PRODUCTS_TABLE, {
+export default Database.define(PRODUCTS_TABLE, {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -59,6 +59,3 @@ const Product = Database.define(PRODUCTS_TABLE, {
     timestamps: true,
     underscored: true,
 });
-
-export default Product;
-

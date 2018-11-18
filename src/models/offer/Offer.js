@@ -7,7 +7,7 @@ import CommissionFormModels from '../commissionForm/CommissionForm';
 
 const OFFER_TABLE = 'offers';
 
-const Offer = Database.define(OFFER_TABLE, {
+export default Database.define(OFFER_TABLE, {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -37,5 +37,3 @@ const Offer = Database.define(OFFER_TABLE, {
     timestamps: true,
     underscored: true,
 });
-
-export default Offer;
