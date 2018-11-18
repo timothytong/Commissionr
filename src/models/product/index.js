@@ -1,6 +1,6 @@
 'use strict';
 
-import CommissionForm from '../commisionForm/CommissionForm';
+import CommissionForm from '../commissionForm/CommissionForm';
 import User from '../user/User';
 import Offer from '../offer/Offer';
 import Product from './Product';

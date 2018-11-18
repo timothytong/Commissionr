@@ -18,13 +18,17 @@ const CommissionForm = Database.define(COMMISSION_FORM_TABLE, {
         allowNull: false,
         defaultValue: false,
     },
-    user_id: {
+    merchant_user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         reference: {
             model: UserModels.user,
         },
     },
+},
+{
+    timestamps: true,
+    underscored: true,
 });
 
 export default CommissionForm;

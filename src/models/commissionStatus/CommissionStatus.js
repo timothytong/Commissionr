@@ -2,34 +2,35 @@
 
 import Database from '../Database';
 import { DataTypes } from 'sequelize';
-import ProductModels from '../product/Product';
-import CommissionFormModels from '../commissionForm/CommissionForm';
+import CommissionModels from '../commission/Comission';
+import CommissionStageModels from '../commissionStage/ComissionStage';
 
-const OFFER_TABLE = 'offers';
+const COMMISSION_STATUS_TABLE = 'commission_statuses';
 
-const Offer = Database.define(OFFER_TABLE, {
+const CommissionStatus = Database.define(COMMISSION_STATUS_TABLE, {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false,
     },
-    form_content: {
+    wips: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: '[]',
     },
-    comm_form_id: {
+    commission_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         reference: {
-            model: CommissionFormModels.commissionForm,
+            model: CommissionModels.commission,
         },
     },
-    product_id: {
+    comm_stage_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         reference: {
-            model: ProductModels.product,
+            model: CommissionStageModels.commissionStage,
         },
     },
 },
@@ -38,4 +39,5 @@ const Offer = Database.define(OFFER_TABLE, {
     underscored: true,
 });
 
-export default Offer;
+export default CommissionStatus;
+

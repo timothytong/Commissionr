@@ -7,7 +7,7 @@ import User from '../user/User';
 
 // define DB relationships
 CommissionForm.belongsTo(User, {
-    foreignKey: 'user_id',
+    foreignKey: 'merchant_user_id',
     targetKey: 'id',
 });
 

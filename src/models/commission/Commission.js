@@ -5,30 +5,30 @@ import { DataTypes } from 'sequelize';
 import CommissionFormModels from '../commissionForm/CommissionForm';
 import UserModels from '../user/User';
 
-const COMM_FORM_RESPONSE_TABLE = 'comm_form_responses';
+const COMMISSION_TABLE = 'commissions';
 
-const CommFormResponse = Database.define(COMM_FORM_RESPONSE_TABLE, {
+const Commission = Database.define(COMMISSION_TABLE, {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false,
     },
-    content: {
-        type: DataTypes.TEXT,
+    final_price: {
+        type: DataTypes.FLOAT,
         allowNull: false,
     },
-    is_voided: {
+    is_paid: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
     },
-    is_accepted: {
-        type: DataTypes.BOOLEAN,
+    state: {
+        type: DataTypes.ENUM('queued', 'started', 'completed', 'cancelled'),
         allowNull: false,
-        defaultValue: false,
+        defaultValue: 'queued',
     },
-    filled_by_user_id: {
+    user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         reference: {
@@ -39,7 +39,7 @@ const CommFormResponse = Database.define(COMM_FORM_RESPONSE_TABLE, {
         type: DataTypes.INTEGER,
         allowNull: false,
         reference: {
-            model: CommissionFormModels.commissionForm,
+            model: UserModels.user,
         },
     },
 },
@@ -48,5 +48,6 @@ const CommFormResponse = Database.define(COMM_FORM_RESPONSE_TABLE, {
     underscored: true,
 });
 
-export default CommFormResponse;
+export default Commission;
+
 

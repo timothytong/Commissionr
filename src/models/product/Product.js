@@ -3,7 +3,7 @@
 import Database from '../Database';
 import { DataTypes } from 'sequelize';
 import UserModels from '../user/User';
-import CommissionFormModels from '../commisionForm/CommissionForm';
+import CommissionFormModels from '../commissionForm/CommissionForm';
 
 const PRODUCTS_TABLE = 'products';
 
@@ -54,6 +54,10 @@ const Product = Database.define(PRODUCTS_TABLE, {
             model: UserModels.user,
         },
     },
+},
+{
+    timestamps: true,
+    underscored: true,
 });
 
 export default Product;

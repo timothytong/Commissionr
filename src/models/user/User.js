@@ -52,6 +52,10 @@ const User = Database.define(USERS_TABLE, {
         allowNull: false,
         defaultValue: false,
     },
+},
+{
+    timestamps: true,
+    underscored: true,
 });
 
 export default User;

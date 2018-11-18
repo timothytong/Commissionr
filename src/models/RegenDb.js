@@ -1,7 +1,9 @@
 import Database from './Database';
 
 import CommFormResponseModels from './commFormResponse';
-import CommissionFormModels from './commisionForm';
+import CommissionModels from './commission';
+import CommissionFormModels from './commissionForm';
+import CommissionStageModels from './commissionStage';
 import OfferModels from './offer';
 import ProductModels from './product';
 import UserModels from './user';
@@ -18,21 +20,48 @@ export default function () {
                 dob: '1995-12-15',
                 is_active: true,
                 is_verified: false,
-                is_merchant: true,
+                is_merchant: false,
                 show_nsfw: false,
+                created_at: new Date(),
+                updated_at: new Date(),
+            },
+            {
+                id: 2,
+                user_name: 'itsprobablymars',
+                display_name: 'Mars',
+                email: 'itsprobablymars@gmail.com',
+                password: '$2a$10$07AA5rKbjovcnZVsY36LIOJXcAwOdTPqqops0Lbv9GVhzILG0cAuO',
+                dob: '1995-12-15',
+                is_active: true,
+                is_verified: true,
+                is_merchant: true,
+                show_nsfw: true,
+                created_at: new Date(),
+                updated_at: new Date(),
             }
         ]))
         .then(() => CommissionFormModels.commissionForm.bulkCreate([
         	{
                 id: 1,
                 is_open: true,
-                user_id: 1,
+                merchant_user_id: 2,
+                created_at: new Date(),
+                updated_at: new Date(),
         	},
         	{
                 id: 2,
                 is_open: false,
-                user_id: 1,
-        	}
+                merchant_user_id: 2,
+                created_at: new Date(),
+                updated_at: new Date(),
+        	},
+        	{
+                id: 3,
+                is_open: true,
+                merchant_user_id: 2,
+                created_at: new Date(),
+                updated_at: new Date(),
+        	},
         ]))
         .then(() => ProductModels.product.bulkCreate([
             {
@@ -45,6 +74,8 @@ export default function () {
                 name: 'Product 1',
                 comm_form_id: 1,
                 user_id: 1,
+                created_at: new Date(),
+                updated_at: new Date(),
             },
             {
                 id: 2,
@@ -56,6 +87,8 @@ export default function () {
                 name: 'Product 2',
                 comm_form_id: 1,
                 user_id: 1,
+                created_at: new Date(),
+                updated_at: new Date(),
             },
             {
                 id: 3,
@@ -67,6 +100,8 @@ export default function () {
                 name: 'Product 3',
                 comm_form_id: 1,
                 user_id: 1,
+                created_at: new Date(),
+                updated_at: new Date(),
             },
         ]))
         .then(() => OfferModels.offer.bulkCreate([
@@ -75,34 +110,94 @@ export default function () {
                 form_content: '[]',
                 comm_form_id: 1,
                 product_id: 1,
+                created_at: new Date(),
+                updated_at: new Date(),
             },
             {
                 id: 2,
                 form_content: '[]',
                 comm_form_id: 1,
                 product_id: 2,
+                created_at: new Date(),
+                updated_at: new Date(),
             },
         ]))
         .then(() => CommFormResponseModels.commFormResponse.bulkCreate([
             {
                 id: 1,
                 content: '[]',
-                final_price: 15,
                 is_voided: false,
                 is_accepted: true,
+                filled_by_user_id: 1,
+                comm_form_id: 1,
+                created_at: new Date(),
+                updated_at: new Date(),
+            },
+            {
+                id: 2,
+                content: '[]',
+                is_voided: true,
+                is_accepted: false,
+                filled_by_user_id: 1,
+                comm_form_id: 1,
+                created_at: new Date(),
+                updated_at: new Date(),
+            },
+        ]))
+        .then(() => CommissionModels.commission.bulkCreate([
+            {
+                id: 1,
+                final_price: 50.00,
+                is_paid: false,
                 user_id: 1,
                 comm_form_id: 1,
             },
             {
                 id: 2,
-                content: '[]',
-                final_price: 10,
-                is_voided: true,
-                is_accepted: false,
+                final_price: 10.00,
+                is_paid: true,
+                state: 'cancelled',
                 user_id: 1,
                 comm_form_id: 1,
             },
+            {
+                id: 3,
+                final_price: 30.00,
+                is_paid: true,
+                state: 'completed',
+                user_id: 1,
+                comm_form_id: 2,
+            },
+            {
+                id: 4,
+                final_price: 130.00,
+                is_paid: true,
+                state: 'started',
+                user_id: 1,
+                comm_form_id: 2,
+            },
         ]))
-        .catch((e) => console.log('Error: ' + e));
+        .then(() => CommissionStageModels.commissionStage.bulkCreate([
+            {
+                id: 1,
+                description: 'Just one stage, simple!',
+                position: 1,
+                product_id: 1,
+            },
+            {
+                id: 2,
+                description: 'Two stages. Stage 1',
+                position: 1,
+                product_id: 2,
+            },
+            {
+                id: 3,
+                description: 'Two stages. Stage 2',
+                position: 2,
+                product_id: 2,
+            },
+        ]))
+        .then((e) => console.log('\n\n\n\n================\nDatabase seeded successfully\n================'))
+        .catch((e) => console.log('\n\n\n\n================\nError: ' + e + '\n================'));
 
 }
