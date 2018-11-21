@@ -7,7 +7,7 @@ import Product from './Product';
 
 // define DB relationships
 Product.belongsTo(User, {
-    foreignKey: 'user_id',
+    foreignKey: 'merchant_id',
     targetKey: 'id',
 });
 

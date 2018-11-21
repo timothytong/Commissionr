@@ -28,6 +28,11 @@ export default Database.define(COMMISSION_TABLE, {
         allowNull: false,
         defaultValue: 'queued',
     },
+    position_in_queue: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    /*
     user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -42,6 +47,7 @@ export default Database.define(COMMISSION_TABLE, {
             model: UserModels.user,
         },
     },
+    */
 },
 {
     timestamps: true,

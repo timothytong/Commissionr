@@ -6,7 +6,7 @@ import User from '../user/User';
 
 // define DB relationships
 CommFormResponse.belongsTo(User, {
-    foreignKey: 'user_id',
+    foreignKey: 'filled_by_user_id',
     targetKey: 'id',
 });
 

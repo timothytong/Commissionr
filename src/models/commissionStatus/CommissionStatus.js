@@ -2,8 +2,8 @@
 
 import Database from '../Database';
 import { DataTypes } from 'sequelize';
-import CommissionModels from '../commission/Comission';
-import CommissionStageModels from '../commissionStage/ComissionStage';
+import CommissionModels from '../commission/Commission';
+import CommissionStageModels from '../commissionStage/CommissionStage';
 
 const COMMISSION_STATUS_TABLE = 'commission_statuses';
 
@@ -19,6 +19,7 @@ export default Database.define(COMMISSION_STATUS_TABLE, {
         allowNull: true,
         defaultValue: '[]',
     },
+    /*
     commission_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -33,6 +34,7 @@ export default Database.define(COMMISSION_STATUS_TABLE, {
             model: CommissionStageModels.commissionStage,
         },
     },
+    */
 },
 {
     timestamps: true,

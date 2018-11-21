@@ -28,6 +28,7 @@ export default Database.define(COMM_FORM_RESPONSE_TABLE, {
         allowNull: false,
         defaultValue: false,
     },
+    /*
     filled_by_user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -42,6 +43,7 @@ export default Database.define(COMM_FORM_RESPONSE_TABLE, {
             model: CommissionFormModels.commissionForm,
         },
     },
+    */
 },
 {
     timestamps: true,

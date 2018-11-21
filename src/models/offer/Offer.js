@@ -18,6 +18,7 @@ export default Database.define(OFFER_TABLE, {
         type: DataTypes.TEXT,
         allowNull: false,
     },
+    /*
     comm_form_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -32,6 +33,7 @@ export default Database.define(OFFER_TABLE, {
             model: ProductModels.product,
         },
     },
+    */
 },
 {
     timestamps: true,

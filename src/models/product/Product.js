@@ -40,6 +40,7 @@ export default Database.define(PRODUCTS_TABLE, {
         type: DataTypes.FLOAT,
         allowNull: false,
     },
+    /*
     comm_form_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -54,6 +55,7 @@ export default Database.define(PRODUCTS_TABLE, {
             model: UserModels.user,
         },
     },
+    */
 },
 {
     timestamps: true,

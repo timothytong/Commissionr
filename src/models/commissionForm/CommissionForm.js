@@ -1,7 +1,8 @@
 'use strict';
 
-import Database from '../Database';
 import { DataTypes } from 'sequelize';
+
+import Database from '../Database';
 import UserModels from '../user/User';
 
 const COMMISSION_FORM_TABLE = 'commission_forms';
@@ -18,6 +19,7 @@ export default Database.define(COMMISSION_FORM_TABLE, {
         allowNull: false,
         defaultValue: false,
     },
+    /*
     merchant_user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -25,6 +27,7 @@ export default Database.define(COMMISSION_FORM_TABLE, {
             model: UserModels.user,
         },
     },
+    */
 },
 {
     timestamps: true,

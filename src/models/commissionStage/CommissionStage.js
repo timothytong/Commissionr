@@ -19,10 +19,16 @@ export default Database.define(COMMISSION_STAGE_TABLE, {
         allowNull: true,
         defaultValue: '',
     },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: '',
+    },
     position: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    /*
     product_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -30,6 +36,7 @@ export default Database.define(COMMISSION_STAGE_TABLE, {
             model: ProductModels.product,
         },
     },
+    */
 },
 {
     timestamps: true,

@@ -4,6 +4,7 @@ import CommFormResponse from './commFormResponse';
 import Commission from './commission';
 import CommissionForm from './commissionForm';
 import CommissionStage from './commissionStage';
+import CommissionStatus from './commissionStatus';
 import Offer from './offer';
 import Product from './product';
 import User from './user';
@@ -151,6 +152,12 @@ export default function () {
                 is_paid: false,
                 user_id: 1,
                 comm_form_id: 1,
+                position_in_queue: 1,
+                product_id: 1,
+                commissioner_id: 1,
+                merchant_id: 2,
+                created_at: new Date(),
+                updated_at: new Date(),
             },
             {
                 id: 2,
@@ -159,6 +166,12 @@ export default function () {
                 state: 'cancelled',
                 user_id: 1,
                 comm_form_id: 1,
+                position_in_queue: 2,
+                product_id: 1,
+                commissioner_id: 1,
+                merchant_id: 2,
+                created_at: new Date(),
+                updated_at: new Date(),
             },
             {
                 id: 3,
@@ -167,6 +180,12 @@ export default function () {
                 state: 'completed',
                 user_id: 1,
                 comm_form_id: 2,
+                position_in_queue: 3,
+                product_id: 1,
+                commissioner_id: 1,
+                merchant_id: 2,
+                created_at: new Date(),
+                updated_at: new Date(),
             },
             {
                 id: 4,
@@ -175,6 +194,12 @@ export default function () {
                 state: 'started',
                 user_id: 1,
                 comm_form_id: 2,
+                position_in_queue: 4,
+                product_id: 2,
+                commissioner_id: 1,
+                merchant_id: 2,
+                created_at: new Date(),
+                updated_at: new Date(),
             },
         ]))
         .then(() => CommissionStage.bulkCreate([
@@ -197,7 +222,20 @@ export default function () {
                 product_id: 2,
             },
         ]))
+        .then(() => CommissionStatus.bulkCreate([
+            {
+                id: 1,
+                wips: '[]',
+                commission_id: 4,
+                comm_stage_id: 1,
+                created_at: new Date(),
+                updated_at: new Date(),
+            },
+        ]))
         .then((e) => console.log('\n\n\n\n================\nDatabase seeded successfully\n================'))
-        .catch((e) => console.log('\n\n\n\n================\nError: ' + e + '\n================'));
+        .catch((e) => {
+            console.log('\n\n\n\n================\nError: ' + e + '\n================');
+            console.log(e)
+        });
 
 }
