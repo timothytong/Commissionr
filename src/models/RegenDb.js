@@ -5,6 +5,7 @@ import Commission from './commission';
 import CommissionForm from './commissionForm';
 import CommissionStage from './commissionStage';
 import CommissionStatus from './commissionStatus';
+import CommissionQueue from './commissionQueue';
 import Offer from './offer';
 import Product from './product';
 import User from './user';
@@ -145,6 +146,16 @@ export default function () {
                 updated_at: new Date(),
             },
         ]))
+        .then(() => CommissionQueue.bulkCreate([
+            {
+                id: 1,
+                name: "Mar's Comm Queue",
+                description: 'Just your erryday comm queue',
+                user_id: 2,
+                created_at: new Date(),
+                updated_at: new Date(),
+            },
+        ]))
         .then(() => Commission.bulkCreate([
             {
                 id: 1,
@@ -152,6 +163,7 @@ export default function () {
                 is_paid: false,
                 user_id: 1,
                 comm_form_id: 1,
+                commission_queue_id: 1,
                 position_in_queue: 1,
                 product_id: 1,
                 commissioner_id: 1,
@@ -166,6 +178,7 @@ export default function () {
                 state: 'cancelled',
                 user_id: 1,
                 comm_form_id: 1,
+                commission_queue_id: 1,
                 position_in_queue: 2,
                 product_id: 1,
                 commissioner_id: 1,
@@ -180,6 +193,7 @@ export default function () {
                 state: 'completed',
                 user_id: 1,
                 comm_form_id: 2,
+                commission_queue_id: 1,
                 position_in_queue: 3,
                 product_id: 1,
                 commissioner_id: 1,
@@ -194,6 +208,7 @@ export default function () {
                 state: 'started',
                 user_id: 1,
                 comm_form_id: 2,
+                commission_queue_id: 1,
                 position_in_queue: 4,
                 product_id: 2,
                 commissioner_id: 1,

@@ -3,6 +3,7 @@
 import Commission from './Commission';
 import CommissionForm from '../commissionForm/CommissionForm';
 import CommissionStatus from '../commissionStatus/CommissionStatus';
+import CommissionQueue from '../commissionQueue/CommissionQueue';
 import Product from '../product/Product';
 import User from '../user/User';
 
@@ -15,7 +16,6 @@ Commission.belongsTo(CommissionForm, {
     targetKey: 'id',
 });
 
-/*
 Commission.belongsTo(CommissionQueue, {
     foreignKey: {
         name: 'commission_queue_id',
@@ -23,7 +23,6 @@ Commission.belongsTo(CommissionQueue, {
     },
     targetKey: 'id',
 });
-*/
 
 Commission.hasMany(CommissionStatus, {
     foreignKey: {
