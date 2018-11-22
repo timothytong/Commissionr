@@ -12,24 +12,16 @@ export default Database.define(USERS_TABLE, {
         primaryKey: true,
         allowNull: false,
     },
-    user_name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
     display_name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    password: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(30),
         allowNull: false,
     },
     dob: {
         type: DataTypes.DATEONLY,
+        allowNull: false,
+    },
+    email: {
+        type: DataTypes.STRING(50),
         allowNull: false,
     },
     is_active: {
@@ -42,15 +34,18 @@ export default Database.define(USERS_TABLE, {
         allowNull: false,
         defaultValue: false,
     },
-    is_merchant: {
-        type: DataTypes.BOOLEAN,
+    password: {
+        type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: false,
     },
     show_nsfw: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
         defaultValue: false,
+    },
+    user_name: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
     },
 },
 {

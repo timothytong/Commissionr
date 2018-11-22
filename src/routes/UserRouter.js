@@ -5,11 +5,16 @@
 import { Router }  from 'express';
 import { DOMAIN_URL } from '../utils/Constants';
 
+import User from '../models/user';
+import Utils from '../utils/Utils';
 import firebase from 'firebase';
-import UserModels from '../models/user';
 import bcrypt from 'bcryptjs';
 
 const SALT_ROUNDS = 10;
+const USERNAME_LEN_LIM = [3, 20];
+const DISPLAY_NAME_LEN_LIM = [1, 30];
+const PASSWORD_LEN_LIM = [6, 30];
+const USER_PARAM_KEYS = ['displayName', 'dob', 'email', 'password', 'username'];
 
 export default class UserRouter {
     // these fields must be type annotated, or Flow will complain!
@@ -72,16 +77,16 @@ export default class UserRouter {
             })
         }
 
-        UserModels.userDb.findOne({
+        User.findOne({
             where: {
-                active: true,
+                is_active: true,
                 id: req.session.key.id,
             }
         }).then((data) => {
-            if (!!data) {
+            if (data) {
                 const user = data.dataValues;
                 return res.status(200).json({
-                    verified: user.verified,
+                    is_verified: user.is_verified,
                 });
             } else {
                 return res.status(500).json({
@@ -116,7 +121,7 @@ export default class UserRouter {
         const password = body.password;
         const newPassword = body.newPassword;
 
-        UserModels.userDb.update({
+        User.update({
             password: newPassword
         },{
             where: {
@@ -151,8 +156,8 @@ export default class UserRouter {
         if (firebase.auth().isSignInWithEmailLink(href)) {
             firebase.auth().signInWithEmailLink(email, href)
                 .then(function(result) {
-                    UserModels.userDb.update({
-                        verified: true,
+                    User.update({
+                        is_verified: true,
                     },{
                         where: {
                             email,
@@ -187,14 +192,14 @@ export default class UserRouter {
     }
 
     updateUser(editInfo, userId, successHandler, errorHandler) {
-        UserModels.userDb.update(editInfo, {
+        User.update(editInfo, {
             where: {
                 id: userId,
             },
             returning: true,
             plain: true,
         }).then((data) => {
-            if (!!data[1].dataValues) {
+            if (data[1].dataValues) {
                 successHandler(data[1].dataValues);
             } else {
                 errorHandler({});
@@ -208,7 +213,7 @@ export default class UserRouter {
         const { body } = req;
         const userId = req.session.key['id'];
         const email = body.email;
-        const username = body.username;
+        const username = body.userName;
         const onSuccessHandler = (data) => {
             req.session.key = data;
             return res.status(200).json({
@@ -223,18 +228,19 @@ export default class UserRouter {
         }
         const editInfo = {};
 
-        if (!!email) {
-            if (!isEmailAddressValid(email)) {
+        if (email) {
+            const errorMessage = getErrorMessageIfEmailIsInvalid(email);
+            if (errorMessage) {
                 return res.status(400).json({
-                    message: 'Invalid email.',
+                    message: errorMessage,
                 });
             }
             editInfo.email = email;
         }
 
-        if (!!username) {
+        if (username) {
             return checkUserNameExists(username).then((data) => {
-                if (!!data) {
+                if (data) {
                     return res.status(400).json({
                         message: 'Username unavailable.',
                         error: err.message,
@@ -257,16 +263,16 @@ export default class UserRouter {
 
     loginUser(req: $Request, res: $Response) {
         const { body } = req;
-        const username = body.username;
+        const username = body.userName;
         const password = body.password;
 
-        UserModels.userDb.findOne({
+        User.findOne({
             where: {
                 user_name: username,
-                active: true,
+                is_active: true,
             }
         }).then((data) => {
-            if (!!data) {
+            if (data) {
                 const user = data.dataValues;
                 bcrypt.compare(password, user.password, (err, correct) => {
                     if (!err && correct) {
@@ -294,7 +300,7 @@ export default class UserRouter {
     }
 
     logout(req: $Request, res: $Response) {
-        if (!!req.session.key) {
+        if (req.session.key) {
             delete req.session.key;
             return res.status(200).json({
                 message: 'Successfully logged out.',
@@ -309,10 +315,10 @@ export default class UserRouter {
     deleteUser(req: $Request, res: $Response) {
         const { body } = req;
 
-        if (!!req.session.key) {
+        if (req.session.key) {
             const userId = req.session.key['id'];
-            UserModels.userDb.update({
-                active: false,
+            User.update({
+                is_active: false,
             },{
                 where: {
                     id: userId,
@@ -344,10 +350,10 @@ export default class UserRouter {
 
     validateUser(req: $Request, res: $Response) {
         const { body } = req;
-        const username = body.username;
+        const username = body.userName;
 
-        checkUserNameExists(username).then((data) => {
-            if (!!data) {
+        checkUsernameExists(username).then((data) => {
+            if (data) {
                 return res.status(400).json({
                     message: 'User already exists.',
                     error: err.message,
@@ -361,13 +367,12 @@ export default class UserRouter {
             console.log(err);
             return res.status(500).json({
                 message: 'Unexpected error occurred while validating username',
-                error: err.message,
+                error: err,
             });
         });
-
     }
 
-    startVerificationProcess (email, successHandler, errorHandler) {
+    startVerificationProcess(email, successHandler, errorHandler) {
         console.log("Processing email " + email + ", REDIRECTING TO: " + DOMAIN_URL + "/verifyUser");
         const actionCodeSettings = {
             url: `${DOMAIN_URL}/verifyUser`,
@@ -384,34 +389,49 @@ export default class UserRouter {
     }
 
     createUser(req: $Request, res: $Response) {
-        const { body } = req;
-        bcrypt.hash(body.password, SALT_ROUNDS, (err, hash) => {
-            if (!!err) {
+        let errorMessage = Utils.getErrorMessageIfNullFieldExists(req.body, USER_PARAM_KEYS);
+        if (errorMessage) {
+            return res.status(400).json({
+                message: errorMessage,
+            });
+        }
+
+        const { username, displayName, email, dob, password } = req.body;
+
+        errorMessage = Utils.getErrorMessageIfInvalidStringLength(username, 'Username', USERNAME_LEN_LIM) ||
+                       getErrorMessageIfUsernameIsInvalid(username, 'Username') ||
+                       Utils.getErrorMessageIfInvalidStringLength(displayName, 'Display name', DISPLAY_NAME_LEN_LIM) ||
+                       getErrorMessageIfUsernameIsInvalid(displayName, 'Display name') ||
+                       Utils.getErrorMessageIfInvalidStringLength(password, 'Password', PASSWORD_LEN_LIM);
+
+        if (errorMessage) {
+            return res.status(400).json({
+                message: errorMessage,
+            });
+        }
+
+        bcrypt.hash(password, SALT_ROUNDS, (err, hash) => {
+            if (err) {
                 return res.status(500).json({
                     message: 'Unable to hash password',
-                    error: err
+                    error: err,
                 });
             }
 
-            const params = {
-                username: body.username,
-                password: hash,
-                email: body.email,
-            };
-
-            checkUserNameExists(params.username).then((data) => {
-                if (!!data) {
+            checkUsernameExists(username).then((data) => {
+                if (data) {
                     return res.status(400).json({
                         message: 'User already exists',
-                        error: 'Known error'
                     });
                 } else {
-                    UserModels.userDb.create({
-                        user_name: params.username,
-                        password: params.password,
-                        email: params.email,
-                        active: true,
-                        verified: false,
+                    User.create({
+                        display_name: displayName,
+                        dob,
+                        email,
+                        is_active: true,
+                        is_verified: false,
+                        password: hash,
+                        user_name: username,
                     }).then(() => {
                         const onSuccess = () => {
                             return res.status(200).json({
@@ -420,43 +440,51 @@ export default class UserRouter {
                         };
                         const onError = (err) => {
                             return res.status(500).json({
-                                message: 'Unable to create user',
+                                message: 'Internal error, please log in to begin verification process.',
                                 error: err,
                             });
                         };
-                        this.startVerificationProcess(params.email, onSuccess, onError);
+                        this.startVerificationProcess(email, onSuccess, onError);
                     }).catch((err) => {
-                        return res.status(500).json({
-                            message: 'User created, but verification service is down. Please log in to start the verification process',
+                        return res.status(400).json({
+                            message: 'Unable to create user.',
                             error: err,
                         });
                     })
                 }
             }).catch((err) => {
                 return res.status(500).json({
-                    message: 'Unknown error',
-                    error: err
+                    message: 'Unexpected error occurred while creating user.',
+                    error: err,
                 });
             })
         });
     }
-
 }
 
-
-function checkUserNameExists (username) {
-    return UserModels.userDb.findOne({
+function checkUsernameExists (username) {
+    return User.findOne({
         where: {
             user_name: username,
-            active: true,
+            is_active: true,
         }
     });
 }
 
-function isEmailAddressValid (email) {
+
+function getErrorMessageIfEmailIsInvalid(email) {
     const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
     if (!email.match(emailRegex)) {
-        return false;
+        return 'Invalid email format.';
     }
-    return true;
+    return null;
 }
+
+function getErrorMessageIfUsernameIsInvalid(username, fieldName) {
+    const usernameRegex = /^[a-zA-Z0-9._]+$/;
+    if (!username.match(usernameRegex)) {
+        return `Invalid ${fieldName} characters. (letters, numbers, ".", and "_" only`;
+    }
+    return null;
+}
+
