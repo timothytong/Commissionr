@@ -18,7 +18,7 @@ export default class UserVerificationButton extends React.Component {
     componentDidMount() {
         axios.get(`${DOMAIN_URL}/api/v1/user/checkUserVerified`)
         .then((response) => {
-            this.setState({loading: false, verified: response.data.verified});
+            this.setState({loading: false, verified: response.data.is_verified});
         })
         .catch((error) => {
             this.setState({loading: false, verified: false});

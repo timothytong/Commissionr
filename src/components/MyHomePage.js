@@ -67,12 +67,3 @@ export default class MyHomePage extends React.Component {
     }
 }
 
-// LESSONS LEARNED
-// 1. Fetch on mount
-// 2. Loading state while fetching
-// 3. Display with ul and use map to transform individual array element into UI elements
-// 4. Use browser console to help figure out what data to extract from response
-// 5. return different UI under different conditions
-// 6. Use this.props.history.push to navigate users to desired page
-// 7. If communicating with backend at all, use Axios
-// 8. Teach NewPostButton history so that the NewPostButton component knows what history comes from

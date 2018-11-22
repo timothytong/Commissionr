@@ -1,9 +1,9 @@
 import { Switch, Route } from 'react-router-dom';
 
-import LoginPage from './LoginPage';
+import LoginPage from './login/LoginPage';
 import MyHomePage from './MyHomePage';
 import UserHomePage from './UserHomePage';
-import SignUpPage from './SignUpPage';
+import SignUpPage from './login/SignUpPage';
 import NewPostPage from './NewPostPage';
 import EditProfilePage from './EditProfilePage';
 import EmailVerificationResultPage from './EmailVerificationResultPage';
