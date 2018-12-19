@@ -1,18 +1,24 @@
-import React from 'react';
+import { DOMAIN_URL } from '../../utils/Constants';
+
 import axios from 'axios';
-import {DOMAIN_URL} from '../../utils/Constants';
+import moment from 'moment';
+import React from 'react';
+import DatePicker from "react-datepicker";
 
 export default class SignUpPage extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-		    username: '',
-		    password: '',
 		    confirmedPassword: '',
+		    displayName: '',
+            dob: moment(new Date()),
 		    errorMessage: '',
+		    password: '',
+		    username: '',
 		};
 		this.handleChange = this.handleChange.bind(this);
 		this.handleCreateAccountButtonClicked = this.handleCreateAccountButtonClicked.bind(this);
+        this.handleDatePickerChange = this.handleDatePickerChange.bind(this);
 	}
 
 	handleChange(e) {
@@ -30,12 +36,16 @@ export default class SignUpPage extends React.Component {
 		} else if (this.state.password !== this.state.confirmedPassword) {
 			this.setState({errorMessage: 'Passwords do not match.'});
 		} else if (this.state.password.length < 6) {
-			this.setState({errorMessage: 'Passwords must be at least six characters.'});
+			this.setState({errorMessage: 'Password must be at least six characters.'});
+		} else if (this.state.displayName.length < 1) {
+			this.setState({errorMessage: 'Display name cannot be empty.'});
 		} else {
 			axios.post(`${DOMAIN_URL}/api/v1/user/create`, {
+                displayName: this.state.displayName,
+                dob: this.state.dob.format(),
 				email: this.state.email,
-				username: this.state.username,
 				password: this.state.password,
+				username: this.state.username,
 			})
 			.then((response) => {
 				console.log(response);
@@ -50,6 +60,10 @@ export default class SignUpPage extends React.Component {
 		}
 	}
 
+    handleDatePickerChange(date) {
+        this.setState({ dob: date });
+    }
+
   	render() {
 	    return (
 	        <div>
@@ -58,11 +72,18 @@ export default class SignUpPage extends React.Component {
                 <input onChange={this.handleChange} type="text" name="email" />
 				<h4>Username:</h4>
                 <input onChange={this.handleChange} type="text" name="username" />
+				<h4>Display Name:</h4>
+                <input onChange={this.handleChange} type="text" name="displayName" />
 				<h4>Password:</h4>
                 <input onChange={this.handleChange} type="password" name="password" />
                 <h4>Confirm Password:</h4>
                 <input onChange={this.handleChange} type="password" name="confirmedPassword" />
-				<button type="button" onClick={this.handleCreateAccountButtonClicked}>Create account</button>
+                <h4>Date of Birth:</h4>
+                <DatePicker
+                    selected={this.state.dob}
+                    onChange={this.handleDatePickerChange}
+                />
+                <button type="button" onClick={this.handleCreateAccountButtonClicked}>Create account</button>
 			</div>
 	    );
   	}

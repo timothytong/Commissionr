@@ -2,7 +2,7 @@
   "name": "sniff_server",
   "version": "0.0.1",
   "main": "index.js",
-  "author": "John Hughes, Timothy Tong",
+  "author": "Timothy Tong",
   "license": "MIT",
   "dependencies": {
     "@google/maps": "^0.5.5",
@@ -24,7 +24,7 @@
     "pg": "^6.4.2",
     "pg-hstore": "^2.3.2",
     "prop-types": "^15.5.10",
-    "react-datepicker": "^1.6.0",
+    "react-datepicker": "^1.8.0",
     "react-dropzone": "^4.3.0",
     "react-geosuggest": "^2.7.0",
     "react-location-picker": "^1.0.1",
@@ -34,7 +34,7 @@
     "sequelize": "^4.41.2"
   },
   "devDependencies": {
-    "babel-core": "^6.24.1",
+    "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
@@ -61,6 +61,7 @@
     "run-sequence": "^2.2.0",
     "style-loader": "^0.22.1",
     "supertest": "^3.0.0",
+    "uglifyjs-webpack-plugin": "^2.0.1",
     "webpack": "^4.16.5",
     "webpack-stream": "^5.1.1"
   },

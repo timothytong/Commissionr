@@ -2,8 +2,8 @@ export default class {
     static getErrorMessageIfNullFieldExists(obj, keys) {
         for (let i = 0; i < keys.length; i++) {
             const key = keys[i];
-            if (!obj[key]) {
-                return `[${key}] field cannot be blank.`;
+            if (!obj[key.sym]) {
+                return `"${key.text}" cannot be blank.`;
             }
         }
         return null;

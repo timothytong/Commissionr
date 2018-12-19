@@ -14,7 +14,28 @@ const SALT_ROUNDS = 10;
 const USERNAME_LEN_LIM = [3, 20];
 const DISPLAY_NAME_LEN_LIM = [1, 30];
 const PASSWORD_LEN_LIM = [6, 30];
-const USER_PARAM_KEYS = ['displayName', 'dob', 'email', 'password', 'username'];
+const USER_PARAM_KEYS = [
+    {
+        text: 'Display Name',
+        sym: 'displayName',
+    },
+    {
+        text: 'Date of Birth',
+        sym: 'dob',
+    },
+    {
+        text: 'Email',
+        sym: 'email',
+    },
+    {
+        text: 'Password',
+        sym: 'password',
+    },
+    {
+        text: 'Username',
+        sym: 'username'
+    },
+];
 
 export default class UserRouter {
     // these fields must be type annotated, or Flow will complain!
@@ -263,7 +284,7 @@ export default class UserRouter {
 
     loginUser(req: $Request, res: $Response) {
         const { body } = req;
-        const username = body.userName;
+        const username = body.username;
         const password = body.password;
 
         User.findOne({
@@ -355,8 +376,7 @@ export default class UserRouter {
         checkUsernameExists(username).then((data) => {
             if (data) {
                 return res.status(400).json({
-                    message: 'User already exists.',
-                    error: err.message,
+                    message: `Username ${username} has already been taken.`,
                 });
             } else {
                 return res.status(200).json({
@@ -421,7 +441,7 @@ export default class UserRouter {
             checkUsernameExists(username).then((data) => {
                 if (data) {
                     return res.status(400).json({
-                        message: 'User already exists',
+                        message: `Username ${username} has already been taken.`,
                     });
                 } else {
                     User.create({
