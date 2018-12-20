@@ -38,8 +38,10 @@ export default class Navbar extends React.Component {
            </button>
         );
         let editProfileButton = null;
+        let userInfo = null;
 
         if (this.props.authenticated) {
+            userInfo = <span>{this.props.user.display_name}</span>;
             loginOutButton = (
                <button type="button" onClick={this.handleLogoutButtonClicked}>
                    Logout
@@ -54,6 +56,7 @@ export default class Navbar extends React.Component {
 
         return (
             <div>
+                {userInfo}
                 {loginOutButton}
                 {editProfileButton}
             </div>

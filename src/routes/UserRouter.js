@@ -128,11 +128,10 @@ export default class UserRouter {
                 message: 'User not logged in'
             })
         }
-        console.log(req.session.key['id']);
+        const user = req.session.key;
         return res.status(200).json({
             message: 'User is logged in',
-            user_name: req.session.key.user_name,
-            email: req.session.key.email,
+            user,
         });
     }
 
@@ -232,9 +231,9 @@ export default class UserRouter {
 
     updateProfile(req: $Request, res: $Response) {
         const { body } = req;
+        const { displayName, email } = body;
         const userId = req.session.key['id'];
-        const email = body.email;
-        const username = body.userName;
+
         const onSuccessHandler = (data) => {
             req.session.key = data;
             return res.status(200).json({
@@ -259,32 +258,16 @@ export default class UserRouter {
             editInfo.email = email;
         }
 
-        if (username) {
-            return checkUserNameExists(username).then((data) => {
-                if (data) {
-                    return res.status(400).json({
-                        message: 'Username unavailable.',
-                        error: err.message,
-                    });
-                } else {
-                    editInfo.user_name = username;
-                    return this.updateUser(editInfo, userId, onSuccessHandler, onErrorHandler);
-                }
-            }).catch((err) => {
-                return res.status(400).json({
-                    message: 'Unexpected error while updating profile',
-                    error: err,
-                });
-            });
+        if (displayName && displayName.length > 0) {
+            editInfo.display_name = displayName;
         }
 
         return this.updateUser(editInfo, userId, onSuccessHandler, onErrorHandler);
-
     }
 
     loginUser(req: $Request, res: $Response) {
         const { body } = req;
-        const username = body.username;
+        const username = body.username.toLowerCase();
         const password = body.password;
 
         User.findOne({
@@ -314,7 +297,7 @@ export default class UserRouter {
             }
         }).catch((err) => {
             return res.status(404).json({
-                message: `User ${username} does not exist`,
+                message: `User ${body.username} does not exist`,
                 error: err,
             });
         });
@@ -371,12 +354,12 @@ export default class UserRouter {
 
     validateUser(req: $Request, res: $Response) {
         const { body } = req;
-        const username = body.userName;
+        const username = body.username.toLowerCase();
 
         checkUsernameExists(username).then((data) => {
             if (data) {
                 return res.status(400).json({
-                    message: `Username ${username} has already been taken.`,
+                    message: `Username ${body.username} has already been taken.`,
                 });
             } else {
                 return res.status(200).json({
@@ -416,12 +399,12 @@ export default class UserRouter {
             });
         }
 
-        const { username, displayName, email, dob, password } = req.body;
+        const { displayName, email, dob, password } = req.body;
+        const username = req.body.username.toLowerCase();
 
         errorMessage = Utils.getErrorMessageIfInvalidStringLength(username, 'Username', USERNAME_LEN_LIM) ||
                        getErrorMessageIfUsernameIsInvalid(username, 'Username') ||
                        Utils.getErrorMessageIfInvalidStringLength(displayName, 'Display name', DISPLAY_NAME_LEN_LIM) ||
-                       getErrorMessageIfUsernameIsInvalid(displayName, 'Display name') ||
                        Utils.getErrorMessageIfInvalidStringLength(password, 'Password', PASSWORD_LEN_LIM);
 
         if (errorMessage) {
@@ -441,7 +424,7 @@ export default class UserRouter {
             checkUsernameExists(username).then((data) => {
                 if (data) {
                     return res.status(400).json({
-                        message: `Username ${username} has already been taken.`,
+                        message: `Username ${req.body.username} has already been taken.`,
                     });
                 } else {
                     User.create({

@@ -69,7 +69,7 @@ export default class LoginPage extends React.Component {
 				<h4>Password:</h4>
                 <input onChange={this.handleChange} type="password" name="password" />
 				<button type="button" onClick={this.handleLoginButtonClicked}>Login</button>
-				<button type="button" onClick={this.handleNewUserClicked}>New User</button>
+				<button type="button" onClick={this.handleNewUserClicked}>Sign Up</button>
 			</div>
 	    );
   	}

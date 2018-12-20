@@ -7,7 +7,8 @@ export default class EditProfilePage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: '',
+            oldDisplayName: '',
+            displayName: '',
             email: '',
         };
         this.handleChange = this.handleChange.bind(this);
@@ -16,21 +17,26 @@ export default class EditProfilePage extends React.Component {
 
     componentDidMount() {
         axios.get(`${DOMAIN_URL}/api/v1/user/session`)
-        .then((response) => {
-            if (response.status === 200 || response.status === 304) {
-                this.setState({retrievedUsername: response.data.user_name, username: response.data.user_name, email: response.data.email});
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-            this.setState({loading: false});
-        });
+            .then((response) => {
+                if (response.status === 200 || response.status === 304) {
+                    const { user } = response.data;
+                    this.setState({
+                        oldDisplayName: user.display_name,
+                        displayName: user.display_name,
+                        email: user.email,
+                    });
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                this.setState({loading: false});
+            });
     }
 
     handleUpdateButtonClicked() {
         const data = { ...this.state };
-        if (this.state.retrievedUsername === this.state.username) {
-            delete data.username;
+        if (this.state.oldDisplayName === this.state.displayName) {
+            delete data.displayName;
         }
         axios.post(`${DOMAIN_URL}/api/v1/user/updateProfile`, data)
         .then((response) => {
@@ -41,7 +47,7 @@ export default class EditProfilePage extends React.Component {
         })
         .catch((error) => {
             console.log(error);
-            this.setState({ errorMessage: error.response.data.error.replace(/notNull Violation: /g,"")});
+            this.setState({ errorMessage: error.response.data.message });
         });
     }
 
@@ -53,10 +59,8 @@ export default class EditProfilePage extends React.Component {
         return (
             <div>
                 <h1>Edit profile</h1>
-                <h4>Username:</h4>
-                <input onChange={this.handleChange} type="text" name="username" value={this.state.username}/>
-                <h4>Email:</h4>
-                <input onChange={this.handleChange} type="text" name="email" value={this.state.email}/>
+                <h4>Display Name:</h4>
+                <input onChange={this.handleChange} type="text" name="displayName" value={this.state.displayName}/>
                 <button type="button" onClick={this.handleUpdateButtonClicked}>Update</button>
             </div>
         )

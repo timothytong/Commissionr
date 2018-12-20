@@ -22,7 +22,7 @@ export default class MyHomePage extends React.Component {
         .then((response) => {
         	this.setState({loading: false});
             if (response.status === 200 || response.status === 304) {
-                this.setState({authenticated: true});
+                this.setState({ authenticated: true, user: response.data.user });
             }
         })
         .catch((error) => {
@@ -36,7 +36,7 @@ export default class MyHomePage extends React.Component {
 
   		if (this.state.errorMessage.length > 0) {
   			errorMessage = <p>{this.state.errorMessage}</p>;
-  		} else if (!!this.props.location.state) {
+  		} else if (this.props.location.state) {
   			errorMessage = <p>{this.props.location.state.message}</p>;
 		}
 
@@ -44,7 +44,11 @@ export default class MyHomePage extends React.Component {
             return (
                 <div>
                     <UserVerificationButton />
-                	<Navbar history={this.props.history} authenticated={this.state.authenticated}/>
+                	<Navbar
+                        user={this.state.user}
+                        history={this.props.history}
+                        authenticated={this.state.authenticated}
+                    />
                     {errorMessage}
                     <PostsList postsEditable={true}/>
                     <NewPostButton history={this.props.history}/>

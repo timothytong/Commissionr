@@ -29,7 +29,7 @@
     "react-geosuggest": "^2.7.0",
     "react-location-picker": "^1.0.1",
     "react-modal": "^3.0.4",
-    "react-router": "^4.2.0",
+    "react-router": "^4.3.1",
     "redis": "^2.7.1",
     "sequelize": "^4.41.2"
   },
