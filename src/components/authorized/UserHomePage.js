@@ -1,9 +1,9 @@
 import React from 'react';
 import axios from 'axios';
-import Navbar from './Navbar';
-import PostsList from './PostsList';
-import NewPostButton from './NewPostButton';
-import {DOMAIN_URL} from '../utils/Constants';
+import Navbar from '../Navbar';
+import PostsList from '../PostsList';
+import NewPostButton from '../NewPostButton';
+import {DOMAIN_URL} from '../../utils/Constants';
 
 export default class UserHomePage extends React.Component {
     constructor(props) {

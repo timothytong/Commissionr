@@ -280,9 +280,11 @@ export default class UserRouter {
                 const user = data.dataValues;
                 bcrypt.compare(password, user.password, (err, correct) => {
                     if (!err && correct) {
-                        req.session.key = data.dataValues;
+                        const user = data.dataValues;
+                        req.session.key = user;
                         return res.status(200).json({
                             message: 'Login successful.',
+                            user,
                         });
                     }
                     return res.status(400).json({
@@ -376,9 +378,9 @@ export default class UserRouter {
     }
 
     startVerificationProcess(email, successHandler, errorHandler) {
-        console.log("Processing email " + email + ", REDIRECTING TO: " + DOMAIN_URL + "/verifyUser");
+        console.log("Processing email " + email + ", REDIRECTING TO: " + DOMAIN_URL + "/verifyuser");
         const actionCodeSettings = {
-            url: `${DOMAIN_URL}/verifyUser`,
+            url: `${DOMAIN_URL}/verifyuser`,
             // This must be true.
             handleCodeInApp: true,
         };
@@ -435,10 +437,12 @@ export default class UserRouter {
                         is_verified: false,
                         password: hash,
                         user_name: username,
-                    }).then(() => {
+                    }).then((user) => {
+                        req.session.key = user;
                         const onSuccess = () => {
                             return res.status(200).json({
                                 message: 'User created.',
+                                user,
                             });
                         };
                         const onError = (err) => {

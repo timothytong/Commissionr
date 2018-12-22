@@ -15,18 +15,6 @@ export default class LoginPage extends React.Component {
 		this.handleNewUserClicked = this.handleNewUserClicked.bind(this);
 	}
 
-	componentDidMount() {
-		axios.get(`${DOMAIN_URL}/api/v1/user/session`)
-        .then((response) => {
-            if (response.status === 200) {
-            	this.props.history.push('/home');
-            }
-        })
-        .catch((error) => {
-			console.log(error);
-		});
-	}
-
 	handleChange(e) {
 		this.setState({[e.target.name]: e.target.value});
 	}
@@ -38,8 +26,8 @@ export default class LoginPage extends React.Component {
 		})
 		.then((response) => {
 			console.log(response);
-			this.setState({username: '', password: ''});
-            this.props.history.push('/home');
+			this.setState({ username: '', password: '' });
+            this.props.setAuthentication(response.data.user);
 		})
 		.catch((error) => {
 			console.log(error);
@@ -48,7 +36,7 @@ export default class LoginPage extends React.Component {
 	}
 
 	handleNewUserClicked() {
-		this.setState({username: '', password: ''});
+		this.setState({ username: '', password: '' });
         this.props.history.push('/signup');
     }
 
@@ -68,6 +56,7 @@ export default class LoginPage extends React.Component {
                 <input onChange={this.handleChange} type="text" name="username" />
 				<h4>Password:</h4>
                 <input onChange={this.handleChange} type="password" name="password" />
+                <br />
 				<button type="button" onClick={this.handleLoginButtonClicked}>Login</button>
 				<button type="button" onClick={this.handleNewUserClicked}>Sign Up</button>
 			</div>
@@ -75,7 +64,3 @@ export default class LoginPage extends React.Component {
   	}
 }
 
-// LESSONS LEARNED
-// 1. Make sure bind all on(*) handles
-// 2. on(*) handles come with event e, retrieve UI element with e.target
-// 3. Doublecheck HTTP verb for each route used (GET? POST? PUT? PATCH? DELETE?)

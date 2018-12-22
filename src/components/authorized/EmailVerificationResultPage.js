@@ -1,5 +1,5 @@
 import {Link} from 'react-router-dom';
-import {DOMAIN_URL} from '../utils/Constants';
+import {DOMAIN_URL} from '../../utils/Constants';
 
 import axios from 'axios';
 import React from 'react';

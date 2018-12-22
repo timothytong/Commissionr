@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
-import Navbar from './Navbar';
-import {DOMAIN_URL} from '../utils/Constants';
+import Navbar from '../Navbar';
+import {DOMAIN_URL} from '../../utils/Constants';
 
 export default class EditProfilePage extends React.Component {
     constructor(props) {

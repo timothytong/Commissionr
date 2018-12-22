@@ -11,11 +11,11 @@ export default class Navbar extends React.Component {
         this.handleEditProfileButtonClicked = this.handleEditProfileButtonClicked.bind(this);
     }
 
-
     handleLogoutButtonClicked(e) {
         axios.get(`${DOMAIN_URL}/api/v1/user/logout`)
         .then((response) => {
             console.log(response);
+            this.props.setAuthentication(false);
             this.props.history.push('/');
         })
         .catch((error) => {
@@ -24,11 +24,11 @@ export default class Navbar extends React.Component {
     }
 
     handleLoginButtonClicked(e) {
-        this.props.history.push('/');
+        this.props.history.replace('/');
     }
 
     handleEditProfileButtonClicked(e) {
-        this.props.history.push('/updateProfile');
+        this.props.history.push('/updateprofile');
     }
 
     render() {

@@ -1,5 +1,5 @@
 import React from 'react';
-import UserVerificationButton from './UserVerificationButton';
+import UserVerificationButton from '../UserVerificationButton';
 
 export default class UserNotVerifiedPage extends React.Component {
     constructor(props) {

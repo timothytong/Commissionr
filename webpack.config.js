@@ -24,6 +24,7 @@ module.exports = {
         path: path.join(__dirname, 'build', 'static', 'js'),
         filename: 'bundle.js'
     },
+    mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
     devtool: "#eval-source-map",
     module : {
         rules : [
