@@ -3,6 +3,8 @@ import {DOMAIN_URL} from '../utils/Constants';
 import React from 'react';
 import axios from 'axios';
 
+import UserVerificationButton from './UserVerificationButton';
+
 export default class Navbar extends React.Component {
     constructor(props) {
         super(props);
@@ -32,30 +34,23 @@ export default class Navbar extends React.Component {
     }
 
     render() {
-        let loginOutButton = (
-           <button type="button" onClick={this.handleLoginButtonClicked}>
-               Login
+        const userInfo = <span>{this.props.user.display_name}</span>;
+
+        const loginOutButton = (
+           <button type="button" onClick={this.handleLogoutButtonClicked}>
+               Logout
            </button>
         );
-        let editProfileButton = null;
-        let userInfo = null;
 
-        if (this.props.authenticated) {
-            userInfo = <span>{this.props.user.display_name}</span>;
-            loginOutButton = (
-               <button type="button" onClick={this.handleLogoutButtonClicked}>
-                   Logout
-               </button>
-            );
-            editProfileButton = (
-                <button type="button" onClick={this.handleEditProfileButtonClicked}>
-                    Edit profile
-                </button>
-            );
-        }
+        const editProfileButton = (
+            <button type="button" onClick={this.handleEditProfileButtonClicked}>
+                Edit profile
+            </button>
+        );
 
         return (
             <div>
+                {this.props.user.is_verified ? null : <UserVerificationButton />}
                 {userInfo}
                 {loginOutButton}
                 {editProfileButton}

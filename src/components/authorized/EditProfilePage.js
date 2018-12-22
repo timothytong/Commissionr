@@ -1,18 +1,36 @@
-import React from 'react';
-import axios from 'axios';
-import Navbar from '../Navbar';
 import {DOMAIN_URL} from '../../utils/Constants';
 
+import React from 'react';
+import axios from 'axios';
+
+import Navbar from '../Navbar';
+import Checkbox from '../shared/uicomponents/Checkbox';
+
 export default class EditProfilePage extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {
             oldDisplayName: '',
             displayName: '',
             email: '',
+            showNsfw: false,
         };
-        this.handleChange = this.handleChange.bind(this);
+        this.handleInputChanged = this.handleInputChanged.bind(this);
+        this.handleCheckboxChanged = this.handleCheckboxChanged.bind(this);
         this.handleUpdateButtonClicked = this.handleUpdateButtonClicked.bind(this);
+    }
+
+    createCheckbox(name, label, isChecked) {
+        return (
+            <Checkbox
+                label={label}
+                name={name}
+                handleCheckboxChanged={this.handleCheckboxChanged}
+                isChecked={this.state[name]}
+                key={Math.random()}
+            />
+        );
     }
 
     componentDidMount() {
@@ -24,6 +42,7 @@ export default class EditProfilePage extends React.Component {
                         oldDisplayName: user.display_name,
                         displayName: user.display_name,
                         email: user.email,
+                        showNsfw: user.show_nsfw,
                     });
                 }
             })
@@ -51,7 +70,11 @@ export default class EditProfilePage extends React.Component {
         });
     }
 
-    handleChange(e) {
+    handleCheckboxChanged(name, checked) {
+        this.setState({[name]: checked});
+    }
+
+    handleInputChanged(e) {
         this.setState({[e.target.name]: e.target.value});
     }
 
@@ -60,9 +83,11 @@ export default class EditProfilePage extends React.Component {
             <div>
                 <h1>Edit profile</h1>
                 <h4>Display Name:</h4>
-                <input onChange={this.handleChange} type="text" name="displayName" value={this.state.displayName}/>
+                <input onChange={this.handleInputChanged} type="text" name="displayName" value={this.state.displayName}/>
                 <button type="button" onClick={this.handleUpdateButtonClicked}>Update</button>
+                {this.createCheckbox("showNsfw", "Show NSFW content", this.state.showNsfw)}
             </div>
         )
     }
 }
+
