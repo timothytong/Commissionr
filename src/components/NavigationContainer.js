@@ -65,7 +65,9 @@ export default class NavigationContainer extends React.Component {
                         <Route exact path='/emailverification' component={EmailVerificationPage} />
                         <Route exact path='/verifyuser' component={EmailVerificationResultPage} />
                         <Route exact path='/unverifieduser' component={UserNotVerifiedPage} />
-                        <Route exact path='/updateprofile' component={EditProfilePage} />
+                        <Route exact path='/updateprofile'
+                               render={(props) => <EditProfilePage setAuthentication={this.setAuthentication} { ...props } />}
+                        />
                         <Route exact path='/user/:username' component={UserHomePage} />
                         <Route component={NotFoundPage} />
                     </Switch>

@@ -217,30 +217,48 @@ export default class UserRouter {
                 id: userId,
             },
             returning: true,
-            plain: true,
-        }).then((data) => {
-            if (data[1].dataValues) {
-                successHandler(data[1].dataValues);
-            } else {
-                errorHandler({});
-            }
+        }).spread((count, rows) => {
+            successHandler(rows[0].dataValues);
         }).catch((err) => {
             errorHandler(err);
         });
     }
 
+    isUserMinor(dob) {
+        const now = new Date();
+        const currentYear = now.getUTCFullYear(),
+            currentMonth = now.getUTCMonth(),
+            currentDay = now.getUTCDay();
+
+        const dobDate = new Date(dob);
+        const dobYear = dobDate.getUTCFullYear(),
+            dobMonth = dobDate.getUTCMonth(),
+            dobDay = dobDate.getUTCDay();
+
+        if (Math.abs(currentYear - dobYear) < 18
+            || currentMonth < dobMonth
+            || currentDay < dobDay) {
+            return true;
+        }
+
+        return false;
+    }
+
     updateProfile(req: $Request, res: $Response) {
         const { body } = req;
-        const { displayName, email } = body;
+        const { displayName, email, showNsfw } = body;
         const userId = req.session.key['id'];
 
-        const onSuccessHandler = (data) => {
-            req.session.key = data;
+        const onSuccessHandler = (user) => {
+            req.session.key = user;
             return res.status(200).json({
+                user,
                 message: 'Successfully updated profile.',
             });
         }
         const onErrorHandler = (err) => {
+            console.log(`Error updating user id ${userId} profile`);
+            console.log(err);
             return res.status(500).json({
                 message: 'Unexpected error while updating profile',
                 error: err,
@@ -260,6 +278,37 @@ export default class UserRouter {
 
         if (displayName && displayName.length > 0) {
             editInfo.display_name = displayName;
+        }
+
+        if (showNsfw === true) {
+            return User.findOne({
+                where: {
+                    id: userId,
+                    is_active: true,
+                }
+            }).then((data) => {
+                if (data) {
+                    const user = data.dataValues;
+                    const { dob } = user;
+
+                    if (this.isUserMinor(dob)) {
+                        console.log(`User ${user.user_name} is minor`);
+                        return res.status(400).json({
+                            message: `User ${user.user_name} is a minor and must not be allowed to access NSFW content`,
+                        });
+                    }
+                    return this.updateUser(editInfo, userId, onSuccessHandler, onErrorHandler);
+                }
+            }).catch((err) => {
+                return res.status(500).json({
+                    message: 'Unexpected error occurred while updating user profile',
+                    error: err,
+                });
+            });
+        }
+
+        if (showNsfw === false) {
+            editInfo.show_nsfw = showNsfw;
         }
 
         return this.updateUser(editInfo, userId, onSuccessHandler, onErrorHandler);
@@ -460,6 +509,7 @@ export default class UserRouter {
                     })
                 }
             }).catch((err) => {
+                console.log(err);
                 return res.status(500).json({
                     message: 'Unexpected error occurred while creating user.',
                     error: err,

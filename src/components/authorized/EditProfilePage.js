@@ -41,7 +41,6 @@ export default class EditProfilePage extends React.Component {
                     this.setState({
                         oldDisplayName: user.display_name,
                         displayName: user.display_name,
-                        email: user.email,
                         showNsfw: user.show_nsfw,
                     });
                 }
@@ -61,7 +60,8 @@ export default class EditProfilePage extends React.Component {
         .then((response) => {
             if (response.status === 200 || response.status === 201) {
                 console.log('Successfully edited.');
-                this.props.history.push('/', { message: response.data.message });
+                this.props.setAuthentication(response.data.user);
+                this.props.history.replace('/', { message: response.data.message });
             }
         })
         .catch((error) => {

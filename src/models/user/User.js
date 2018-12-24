@@ -1,5 +1,7 @@
 'use strict';
 
+import moment from 'moment';
+
 import Database from '../Database';
 import { DataTypes } from 'sequelize';
 
@@ -47,8 +49,7 @@ export default Database.define(USERS_TABLE, {
         type: DataTypes.STRING(20),
         allowNull: false,
     },
-},
-{
+}, {
     timestamps: true,
     underscored: true,
 });
