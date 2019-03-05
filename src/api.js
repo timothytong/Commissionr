@@ -13,6 +13,7 @@ import morgan from 'morgan';
 import path from 'path';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import CommissionRouter from './routes/CommissionRouter';
 import UserRouter from './routes/UserRouter';
 import PostRouter from './routes/PostRouter';
 import regenDb from './models/RegenDb';
@@ -59,9 +60,11 @@ export default class Api {
     // connect resource routers
     routes(): void {
         const userRouter: UserRouter = new UserRouter();
+        const commissionRouter: CommissionRouter = new CommissionRouter();
 
         // attach it to our express app
         this.express.use(userRouter.path, checkRedisConnect, userRouter.router);
+        this.express.use(commissionRouter.path, checkRedisConnect, commissionRouter.router);
 
         this.express.use(express.static(path.join(__dirname, 'static')));
         this.express.get('/*', (req, res) => res.sendFile(path.resolve(__dirname, 'static', 'index.html')));
