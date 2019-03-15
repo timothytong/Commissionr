@@ -5,6 +5,7 @@
 import { Router }  from 'express';
 import { DOMAIN_URL } from '../utils/Constants';
 
+import Commission from '../models/commission';
 import User from '../models/user';
 import Utils from '../utils/Utils';
 import firebase from 'firebase';
@@ -68,6 +69,46 @@ export default class UserRouter {
         this.router.get('/logout', this.logout);
         this.router.get('/session', this.getSession);
         this.router.get('/startVerification', this.startVerification);
+        this.router.get('/:user_id/customer-commissions', this.getCustomerCommissions);
+        this.router.get('/:user_id/merchant-commissions', this.getMerchantCommissions);
+    }
+
+    getCustomerCommissions(req: $Request, res: $Response) {
+        const customerId = req.params.user_id;
+
+        Commission.findAll({
+            where: {
+                commissioner_id: customerId,
+            },
+        }).then((commissions) => {
+            return res.status(200).json({
+                commissions: commissions,
+            });
+        }).catch((err) => {
+            return res.status(404).json({
+                message: 'Unable to find user',
+                error: err,
+            });
+        });
+    }
+
+    getMerchantCommissions(req: $Request, res: $Response) {
+        const merchantId = req.params.user_id;
+
+        Commission.findAll({
+            where: {
+                merchant_id: merchantId,
+            },
+        }).then((commissions) => {
+            return res.status(200).json({
+                commissions: commissions,
+            });
+        }).catch((err) => {
+            return res.status(404).json({
+                message: 'Unable to find user',
+                error: err,
+            });
+        });
     }
 
     startVerification(req: $Request, res: $Response) {
@@ -544,4 +585,3 @@ function getErrorMessageIfUsernameIsInvalid(username, fieldName) {
     }
     return null;
 }
-
