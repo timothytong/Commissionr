@@ -9,7 +9,7 @@ import User from '../models/user';
 import Commission from '../models/commission';
 import Utils from '../utils/Utils';
 
-export default class UserRouter {
+export default class CommissionRouter {
     // these fields must be type annotated, or Flow will complain!
     router: Router;
     path: string;
@@ -31,13 +31,14 @@ export default class UserRouter {
 
     getUserCommissions(req: $Request, res: $Response) {
         const commissionerId = req.params.user_id;
+
         Commission.findAll({
             where: {
                 commissioner_id: commissionerId,
             },
         }).then((commissions) => {
             return res.status(200).json({
-                commissions: commissions
+                commissions: commissions,
             });
         }).catch((err) => {
             return res.status(404).json({
@@ -46,5 +47,5 @@ export default class UserRouter {
             });
         });
     }
-}
 
+}
