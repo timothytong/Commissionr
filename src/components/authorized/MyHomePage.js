@@ -6,6 +6,8 @@ import axios from 'axios';
 import Navbar from '../Navbar';
 import UserVerificationButton from '../UserVerificationButton';
 
+import CustomerCommissionList from '../shared/uicomponents/CustomerCommissionList';
+
 export default class MyHomePage extends React.Component {
     constructor(props) {
         super(props);
@@ -52,11 +54,7 @@ export default class MyHomePage extends React.Component {
             <div>
                 {errorMessage}
                 <h1>Home</h1>
-                <ul>
-                    {this.state.customerCommissions.map((commission) => {
-                        return <li key={Math.random()}>{commission.id}-${commission.final_price}-{commission.position_in_queue}</li>
-                    })}
-                </ul>
+                <CustomerCommissionList customerCommissions={this.state.customerCommissions} />
             </div>
         );
     }
