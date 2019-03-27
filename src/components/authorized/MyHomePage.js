@@ -14,28 +14,21 @@ export default class MyHomePage extends React.Component {
         this.state = {
             loading: true,
             errorMessage: '',
-            customerCommissions: [],
+            user: null,
+            error: false,
         };
     }
 
     componentDidMount() {
         axios.get(`${DOMAIN_URL}/api/v1/user/session`)
         .then((response) => {
-            this.setState({loading: false});
             if (response.status === 200 || response.status === 304) {
                 this.setState({ authenticated: true, user: response.data.user });
-                axios.get(`${DOMAIN_URL}/api/v1/user/${response.data.user.id}/customer-commissions`)
-                .then((response) => {
-                    if (response.status === 200 || response.status === 304) {
-                        this.setState({ customerCommissions: response.data.commissions });
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
             }
+            this.setState({loading: false});
         })
         .catch((error) => {
+            this.setState({ loading: false, errorMessage: 'User not found', error: true });
             console.log(error);
             this.props.history.push('/');
         });
@@ -54,7 +47,7 @@ export default class MyHomePage extends React.Component {
             <div>
                 {errorMessage}
                 <h1>Home</h1>
-                <CustomerCommissionList customerCommissions={this.state.customerCommissions} />
+                { this.state.loading ? <li>Loading</li> : <CustomerCommissionList userId={this.state.user.id}/>}
             </div>
         );
     }
