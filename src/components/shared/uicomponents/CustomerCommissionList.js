@@ -19,7 +19,7 @@ export default class CustomerCommissionList extends React.Component {
                 this.setState({ customerCommissions: response.data.commissions });
             }
             this.setState({loading: false});
-        }).catch((error) => {   
+        }).catch((error) => {
             console.log(error);
         });
     }
