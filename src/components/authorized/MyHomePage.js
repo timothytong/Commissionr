@@ -6,32 +6,25 @@ import axios from 'axios';
 import Navbar from '../Navbar';
 import UserVerificationButton from '../UserVerificationButton';
 
+import CustomerCommissionList from '../shared/uicomponents/CustomerCommissionList';
+
 export default class MyHomePage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             loading: true,
             errorMessage: '',
-            customerCommissions: [],
+            userId: '',
         };
     }
 
     componentDidMount() {
         axios.get(`${DOMAIN_URL}/api/v1/user/session`)
         .then((response) => {
-            this.setState({loading: false});
             if (response.status === 200 || response.status === 304) {
-                this.setState({ authenticated: true, user: response.data.user });
-                axios.get(`${DOMAIN_URL}/api/v1/user/${response.data.user.id}/customer-commissions`)
-                .then((response) => {
-                    if (response.status === 200 || response.status === 304) {
-                        this.setState({ customerCommissions: response.data.commissions });
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+                this.setState({ authenticated: true, userId: response.data.user.id });
             }
+            this.setState({loading: false});
         })
         .catch((error) => {
             console.log(error);
@@ -52,11 +45,7 @@ export default class MyHomePage extends React.Component {
             <div>
                 {errorMessage}
                 <h1>Home</h1>
-                <ul>
-                    {this.state.customerCommissions.map((commission) => {
-                        return <li key={Math.random()}>{commission.id}-${commission.final_price}-{commission.position_in_queue}</li>
-                    })}
-                </ul>
+                {!(this.state.loading) && <CustomerCommissionList userId={this.state.userId} />}
             </div>
         );
     }
