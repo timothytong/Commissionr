@@ -14,7 +14,8 @@ export default class MyHomePage extends React.Component {
         this.state = {
             loading: true,
             errorMessage: '',
-            userId: '',
+            user: null,
+            error: false,
         };
     }
 
@@ -22,11 +23,12 @@ export default class MyHomePage extends React.Component {
         axios.get(`${DOMAIN_URL}/api/v1/user/session`)
         .then((response) => {
             if (response.status === 200 || response.status === 304) {
-                this.setState({ authenticated: true, userId: response.data.user.id });
+                this.setState({ authenticated: true, user: response.data.user });
             }
             this.setState({loading: false});
         })
         .catch((error) => {
+            this.setState({ loading: false, errorMessage: 'User not found', error: true });
             console.log(error);
             this.props.history.push('/');
         });
@@ -45,7 +47,7 @@ export default class MyHomePage extends React.Component {
             <div>
                 {errorMessage}
                 <h1>Home</h1>
-                {!(this.state.loading) && <CustomerCommissionList userId={this.state.userId} />}
+                { this.state.loading ? <li>Loading</li> : <CustomerCommissionList userId={this.state.user.id}/>}
             </div>
         );
     }

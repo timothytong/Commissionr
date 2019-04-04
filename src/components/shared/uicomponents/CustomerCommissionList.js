@@ -9,6 +9,7 @@ export default class CustomerCommissionList extends React.Component {
         this.state = {
             loading: true,
             customerCommissions: [],
+            error: false,
         };
     }
 
@@ -20,6 +21,7 @@ export default class CustomerCommissionList extends React.Component {
             }
             this.setState({loading: false});
         }).catch((error) => {
+            this.setState({loading: false, error: true});
             console.log(error);
         });
     }
@@ -27,7 +29,7 @@ export default class CustomerCommissionList extends React.Component {
     render() {
         return (
             <ul>
-                {!(this.state.loading) && this.state.customerCommissions.map((commission) => {
+                { this.state.loading ? <li>Loading</li> : this.state.customerCommissions.map((commission) => {
                     return <li key={Math.random()}>{commission.id}-${commission.final_price}-{commission.position_in_queue}</li>
                 })}
             </ul>
