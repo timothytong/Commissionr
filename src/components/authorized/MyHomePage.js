@@ -35,10 +35,12 @@ export default class MyHomePage extends React.Component {
     }
 
     render() {
+        let commissionList = this.state.loading ? <p>Loading</p> : <CustomerCommissionList userId={this.state.user.id}/>;
         let errorMessage = '';
 
         if (this.state.errorMessage.length > 0) {
             errorMessage = <p>{this.state.errorMessage}</p>;
+            commissionList = <p>Error</p>;
         } else if (this.props.location.state) {
             errorMessage = <p>{this.props.location.state.message}</p>;
         }
@@ -47,7 +49,7 @@ export default class MyHomePage extends React.Component {
             <div>
                 {errorMessage}
                 <h1>Home</h1>
-                { this.state.loading ? <li>Loading</li> : <CustomerCommissionList userId={this.state.user.id}/>}
+                {commissionList}
             </div>
         );
     }
