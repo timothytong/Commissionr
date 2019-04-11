@@ -16,7 +16,9 @@ export default class MyHomePage extends React.Component {
             errorMessage: '',
             user: null,
             error: false,
+            showCustomerList: true,
         };
+        this.handleClick = this.handleClick.bind(this);
     }
 
     componentDidMount() {
@@ -34,8 +36,13 @@ export default class MyHomePage extends React.Component {
         });
     }
 
+    handleClick(showCustomerList) {
+        this.setState({showCustomerList});
+    }
+
     render() {
-        let commissionList = this.state.loading ? <p>Loading</p> : <CustomerCommissionList userId={this.state.user.id}/>;
+        let commissionList = this.state.loading ? <p>Loading</p> :
+            this.state.showCustomerList ? <CustomerCommissionList userId={this.state.user.id}/> : <p>Merchant</p>;
         let errorMessage = '';
 
         if (this.state.errorMessage.length > 0) {
@@ -49,6 +56,8 @@ export default class MyHomePage extends React.Component {
             <div>
                 {errorMessage}
                 <h1>Home</h1>
+                <button onClick={() => this.handleClick(true)}>Customer</button>
+                <button onClick={() => this.handleClick(false)}>Merchant</button>
                 {commissionList}
             </div>
         );
