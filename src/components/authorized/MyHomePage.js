@@ -7,6 +7,7 @@ import Navbar from '../Navbar';
 import UserVerificationButton from '../UserVerificationButton';
 
 import CustomerCommissionList from '../shared/uicomponents/CustomerCommissionList';
+import MerchantCommissionList from '../shared/uicomponents/MerchantCommissionList';
 
 export default class MyHomePage extends React.Component {
     constructor(props) {
@@ -18,7 +19,7 @@ export default class MyHomePage extends React.Component {
             error: false,
             showCustomerList: true,
         };
-        this.handleClick = this.handleClick.bind(this);
+        this.displayCommissions = this.displayCommissions.bind(this);
     }
 
     componentDidMount() {
@@ -36,13 +37,19 @@ export default class MyHomePage extends React.Component {
         });
     }
 
-    handleClick(showCustomerList) {
+    displayCommissions(showCustomerList) {
         this.setState({showCustomerList});
     }
 
     render() {
-        let commissionList = this.state.loading ? <p>Loading</p> :
-            this.state.showCustomerList ? <CustomerCommissionList userId={this.state.user.id}/> : <p>Merchant</p>;
+        let commissionList = null;
+        if (this.state.loading) {
+            commissionList = <p>Loading</p>;
+        } else if (this.state.showCustomerList) {
+            commissionList = <CustomerCommissionList userId={this.state.user.id}/>;
+        } else {
+            commissionList = <MerchantCommissionList userId={this.state.user.id}/>;
+        }
         let errorMessage = '';
 
         if (this.state.errorMessage.length > 0) {
@@ -56,8 +63,8 @@ export default class MyHomePage extends React.Component {
             <div>
                 {errorMessage}
                 <h1>Home</h1>
-                <button onClick={() => this.handleClick(true)}>Customer</button>
-                <button onClick={() => this.handleClick(false)}>Merchant</button>
+                <button onClick={() => this.displayCommissions(true)}>Customer</button>
+                <button onClick={() => this.displayCommissions(false)}>Merchant</button>
                 {commissionList}
             </div>
         );
