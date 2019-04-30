@@ -13,6 +13,7 @@ import morgan from 'morgan';
 import path from 'path';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import CommissionQueueRouter from './routes/CommissionQueueRouter'
 import CommissionRouter from './routes/CommissionRouter';
 import CommissionStageRouter from './routes/CommissionStageRouter';
 import UserRouter from './routes/UserRouter';
@@ -61,10 +62,12 @@ export default class Api {
     // connect resource routers
     routes(): void {
         const userRouter: UserRouter = new UserRouter();
+        const commissionQueueRouter = new CommissionQueueRouter();
         const commissionRouter = new CommissionRouter();
         const commissionStageRouter = new CommissionStageRouter();
         // attach it to our express app
         this.express.use(userRouter.path, checkRedisConnect, userRouter.router);
+        this.express.use(commissionQueueRouter.path, checkRedisConnect, commissionQueueRouter.router);
         this.express.use(commissionRouter.path, checkRedisConnect, commissionRouter.router);
         this.express.use(commissionStageRouter.path, checkRedisConnect, commissionStageRouter.router);
         this.express.use(express.static(path.join(__dirname, 'static')));
